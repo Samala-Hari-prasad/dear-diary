@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.3.0] - 2026-07-01
+### Added
+- central database services for loading manifest, meta-indexes, and pages.
+- Facade service wrapper (`RepositoryService`) in `lib/github/repository.ts`.
+- Structured page models (`DiaryPage`, `DiaryPageSummary`).
+- Consistent API endpoints (`/api/v1/diary/manifest`, `/api/v1/diary/pages`, `/api/v1/diary/pages/[slug]`).
+- Dumb presentational `<PageList />` and `<PageView />` components with extensible `<DocumentRenderer />` blocks.
+- Skeletons and orchestrators in `app/page.tsx` for clean loading UI.
+
 ## [v0.2.0] - 2026-07-01
 ### Added
 - GitHub service layer client helper (`lib/github/client.ts`).
