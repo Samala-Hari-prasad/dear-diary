@@ -11,6 +11,7 @@ A map of the project's documentation.
 | `docs/definition-of-done.md`  | Exact scope and acceptance criteria for the current milestone       |
 | `docs/roadmap.md`             | Multi-phase implementation roadmap                                  |
 | `docs/adr.md`                 | Architecture Decision Records log                                   |
+| `docs/changelog.md`           | Project changelog and history                                       |
 
 ## Suggested Reading Order
 
