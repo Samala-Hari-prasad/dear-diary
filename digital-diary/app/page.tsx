@@ -2,6 +2,7 @@ import { Plus, NotebookPen } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { RepositoryStatus } from "@/components/status/repository-status";
 import {
   APP_TAGLINE,
   EMPTY_STATE_SUBTITLE,
@@ -46,6 +47,8 @@ export default function Home() {
             {EMPTY_STATE_SUBTITLE}
           </p>
         </Card>
+
+        <RepositoryStatus />
       </section>
     </AppShell>
   );
