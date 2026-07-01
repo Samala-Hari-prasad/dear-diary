@@ -9,6 +9,8 @@ A map of the project's documentation.
 | `docs/constitution.md`        | Non-negotiable product and design principles                       |
 | `docs/design-system.md`       | Typography, color, spacing, and motion specification                |
 | `docs/definition-of-done.md`  | Exact scope and acceptance criteria for the current milestone       |
+| `docs/roadmap.md`             | Multi-phase implementation roadmap                                  |
+| `docs/adr.md`                 | Architecture Decision Records log                                   |
 
 ## Suggested Reading Order
 

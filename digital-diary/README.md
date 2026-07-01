@@ -4,14 +4,18 @@ A private, Korean-minimalist digital diary. The application is designed to feel
 like opening a beautiful paper notebook — calm, elegant, and timeless. It is
 not a productivity app, not a dashboard, and not a note-taking SaaS product.
 
-## Current Milestone
+## Current Version
 
-**v0.1.0 — Visual Shell**
+v0.2.0
 
-This release implements the visual foundation only: layout, theme, typography,
-and the homepage shell. No authentication, storage, editors, or data
-persistence exist yet. See `docs/definition-of-done.md` for the exact scope of
-this release.
+## Completed
+
+- ✔ Visual Shell
+- ✔ Repository Connection
+
+## Next
+
+- → Repository Reading (Read-Only)
 
 ## Stack
 

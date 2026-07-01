@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { RefreshCw, CheckCircle2, AlertCircle } from "lucide-react";
+import { RefreshCw, CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-interface StatusResponse {
+interface Diagnostic {
+  code: string;
+  severity: "error" | "warning";
+  message: string;
+}
+
+interface RepositoryHealth {
   healthy: boolean;
+  version: string;
+  timestamp: string;
   repository?: {
     owner: string;
     name: string;
@@ -19,15 +27,15 @@ interface StatusResponse {
     appVersion?: string;
     owner?: string;
     createdAt?: string;
+    application?: string;
+    theme?: string;
+    language?: string;
   };
-  error?: {
-    code: string;
-    message: string;
-  };
+  diagnostics: Diagnostic[];
 }
 
 export function RepositoryStatus() {
-  const [status, setStatus] = useState<StatusResponse | null>(null);
+  const [status, setStatus] = useState<RepositoryHealth | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchStatus = async () => {
@@ -39,10 +47,15 @@ export function RepositoryStatus() {
     } catch {
       setStatus({
         healthy: false,
-        error: {
-          code: "FETCH_FAILED",
-          message: "Failed to connect to the internal system status API.",
-        },
+        version: "1.0.0",
+        timestamp: new Date().toISOString(),
+        diagnostics: [
+          {
+            code: "FETCH_FAILED",
+            severity: "error",
+            message: "Failed to connect to the internal system status API.",
+          },
+        ],
       });
     } finally {
       setLoading(false);
@@ -52,6 +65,9 @@ export function RepositoryStatus() {
   useEffect(() => {
     fetchStatus();
   }, []);
+
+  const activeError = status?.diagnostics?.find((d) => d.severity === "error");
+  const activeWarning = status?.diagnostics?.find((d) => d.severity === "warning");
 
   return (
     <Card className="w-full flex flex-col gap-6 text-left">
@@ -86,23 +102,35 @@ export function RepositoryStatus() {
               <>
                 <CheckCircle2 size={16} className="text-accent" aria-hidden="true" />
                 <span className="text-sm font-medium text-foreground tracking-wide">
-                  Connected
+                  Connected. Your diary is ready.
+                </span>
+              </>
+            ) : activeError ? (
+              <>
+                <AlertCircle size={16} className="text-red-600 dark:text-red-400" aria-hidden="true" />
+                <span className="text-sm font-medium text-foreground tracking-wide">
+                  Error: {activeError.code}
                 </span>
               </>
             ) : (
               <>
-                <AlertCircle size={16} className="text-red-600 dark:text-red-400" aria-hidden="true" />
+                <AlertTriangle size={16} className="text-amber-600 dark:text-amber-400" aria-hidden="true" />
                 <span className="text-sm font-medium text-foreground tracking-wide">
-                  Error: {status.error?.code || "UNHEALTHY"}
+                  Unhealthy connection
                 </span>
               </>
             )}
           </div>
 
-          {/* Error Message Details */}
-          {status.error && (
+          {/* Diagnostic Messages */}
+          {activeError && (
             <p className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/20 px-3 py-2 rounded-sm border border-red-200/50 dark:border-red-900/30 leading-relaxed">
-              {status.error.message}
+              {activeError.message}
+            </p>
+          )}
+          {!activeError && activeWarning && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 px-3 py-2 rounded-sm border border-amber-200/50 dark:border-amber-900/30 leading-relaxed">
+              {activeWarning.message}
             </p>
           )}
 
@@ -129,10 +157,10 @@ export function RepositoryStatus() {
             <div>
               <span className="block text-xs text-foreground/50 tracking-wide uppercase">Manifest</span>
               <span className="font-medium text-foreground">
-                {status.manifest?.found ? (
+                {status.manifest?.found && !activeError ? (
                   <span className="text-accent">Loaded (v{status.manifest.appVersion})</span>
                 ) : (
-                  <span className="text-foreground/50">Missing</span>
+                  <span className="text-foreground/50">Missing or invalid</span>
                 )}
               </span>
             </div>
