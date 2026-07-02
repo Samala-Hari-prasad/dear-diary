@@ -29,6 +29,8 @@ export function PageView({ page, onPageUpdate }: PageViewProps) {
       createdAt: page.summary.updatedAt,
       updatedAt: page.summary.updatedAt,
       sha: page.sha,
+      favorite: page.summary.favorite,
+      archived: page.summary.archived,
     });
     setMode("read");
   }, [page]);
@@ -46,6 +48,8 @@ export function PageView({ page, onPageUpdate }: PageViewProps) {
           cover: page.summary.cover,
           updatedAt: updatedSession.updatedAt,
           tags: updatedSession.tags,
+          favorite: updatedSession.favorite,
+          archived: updatedSession.archived,
         },
         blocks: updatedSession.content,
         sha: page.sha, // Maintain loaded SHA for concurrency
@@ -113,6 +117,8 @@ export function PageView({ page, onPageUpdate }: PageViewProps) {
                   cover: page.summary.cover,
                   updatedAt: session.updatedAt,
                   tags: session.tags,
+                  favorite: session.favorite,
+                  archived: session.archived,
                 },
                 blocks: session.content,
                 sha: session.sha,

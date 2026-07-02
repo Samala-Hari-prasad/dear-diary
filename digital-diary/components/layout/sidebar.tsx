@@ -18,6 +18,17 @@ import {
   filterThisMonth,
 } from "@/lib/calendar/timeline";
 
+// Organization imports
+import { TagList } from "@/components/organization/tag-list";
+import { CollectionsView, CollectionFilter } from "@/components/organization/collections-view";
+import {
+  filterByTag,
+  getFavoritePages,
+  getArchivedPages,
+  getActivePages,
+  getAllTags,
+} from "@/lib/repository/repository-organization";
+
 interface SidebarProps {
   pages?: DiaryPageSummary[];
   selectedSlug?: string;
@@ -25,37 +36,61 @@ interface SidebarProps {
 }
 
 export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: SidebarProps) {
-  const [activeTab, setActiveTab] = useState<"search" | "calendar">("search");
+  const [activeTab, setActiveTab] = useState<"search" | "collections" | "calendar">("search");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Calendar timeline states
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [timeFilter, setTimeFilter] = useState<TimeRangeFilter>("all");
 
+  // Organization states
+  const [collectionFilter, setCollectionFilter] = useState<CollectionFilter>("all");
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+  // Standard listings exclude archived items
+  const activePages = getActivePages(pages);
+
   // Determine filtered list based on active mode
-  let filteredPages = pages;
+  let filteredPages = activePages;
 
   if (activeTab === "search") {
     filteredPages = searchQuery.trim() !== "" 
-      ? queryIndex(pages, searchQuery) 
-      : pages;
-  } else if (activeTab === "calendar") {
-    if (selectedDate) {
-      filteredPages = pages.filter((page) => formatDateKey(page.updatedAt) === selectedDate);
+      ? queryIndex(activePages, searchQuery) 
+      : activePages;
+  } else if (activeTab === "collections") {
+    if (selectedTag) {
+      filteredPages = filterByTag(pages, selectedTag);
     } else {
-      switch (timeFilter) {
-        case "today":
-          filteredPages = filterToday(pages);
+      switch (collectionFilter) {
+        case "favorites":
+          filteredPages = getFavoritePages(pages);
           break;
-        case "week":
-          filteredPages = filterThisWeek(pages);
-          break;
-        case "month":
-          filteredPages = filterThisMonth(pages);
+        case "archive":
+          filteredPages = getArchivedPages(pages);
           break;
         case "all":
         default:
-          filteredPages = pages;
+          filteredPages = activePages;
+          break;
+      }
+    }
+  } else if (activeTab === "calendar") {
+    if (selectedDate) {
+      filteredPages = activePages.filter((page) => formatDateKey(page.updatedAt) === selectedDate);
+    } else {
+      switch (timeFilter) {
+        case "today":
+          filteredPages = filterToday(activePages);
+          break;
+        case "week":
+          filteredPages = filterThisWeek(activePages);
+          break;
+        case "month":
+          filteredPages = filterThisMonth(activePages);
+          break;
+        case "all":
+        default:
+          filteredPages = activePages;
           break;
       }
     }
@@ -63,7 +98,6 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
 
   const handleSelectDate = (date: string | null) => {
     setSelectedDate(date);
-    // Reset range filter when a specific date is chosen to prevent conflict
     if (date !== null) {
       setTimeFilter("all");
     }
@@ -71,9 +105,22 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
 
   const handleSelectTimeFilter = (filter: TimeRangeFilter) => {
     setTimeFilter(filter);
-    // Reset specific date selection when a range filter is clicked
     setSelectedDate(null);
   };
+
+  const handleSelectCollection = (filter: CollectionFilter) => {
+    setCollectionFilter(filter);
+    setSelectedTag(null); // Reset tag when collection changes
+  };
+
+  const handleSelectTag = (tag: string | null) => {
+    setSelectedTag(tag);
+  };
+
+  // Get dynamic tags list and counts
+  const tagsList = getAllTags(pages);
+  const favoritesCount = getFavoritePages(pages).length;
+  const archiveCount = getArchivedPages(pages).length;
 
   return (
     <aside className="hidden w-56 shrink-0 border-r border-border px-6 py-8 md:block overflow-y-auto max-h-[calc(100vh-64px)]">
@@ -90,6 +137,17 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
             }`}
           >
             Search
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("collections")}
+            className={`flex-1 text-center pb-2 text-[11px] font-medium transition-all duration-200 border-b ${
+              activeTab === "collections"
+                ? "border-foreground text-foreground"
+                : "border-transparent text-foreground/40 hover:text-foreground/75"
+            }`}
+          >
+            Organize
           </button>
           <button
             type="button"
@@ -127,11 +185,45 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
           </div>
         )}
 
+        {activeTab === "collections" && (
+          <div className="flex flex-col gap-6">
+            <div className="px-1">
+              <CollectionsView
+                activeFilter={collectionFilter}
+                onSelectFilter={handleSelectCollection}
+                favoritesCount={favoritesCount}
+                archiveCount={archiveCount}
+              />
+            </div>
+
+            <div className="px-1">
+              <TagList
+                tags={tagsList}
+                selectedTag={selectedTag}
+                onSelectTag={handleSelectTag}
+              />
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-border/40 pt-4">
+              <span className="flex items-center gap-3 rounded-sm px-3 py-1 text-xs text-foreground/45 font-medium select-none uppercase tracking-wider">
+                Results
+              </span>
+              <div className="pl-1">
+                {filteredPages.length === 0 ? (
+                  <EmptySearch />
+                ) : (
+                  <PageList pages={filteredPages} selectedSlug={selectedSlug} onSelect={onSelect} />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === "calendar" && (
           <div className="flex flex-col gap-6">
             <div className="px-1">
               <CalendarView
-                pages={pages}
+                pages={activePages}
                 selectedDate={selectedDate}
                 onSelectDate={handleSelectDate}
               />

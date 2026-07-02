@@ -10,4 +10,6 @@ export interface EditorSession {
   createdAt: string;
   updatedAt: string;
   sha?: string;
+  favorite?: boolean;
+  archived?: boolean;
 }

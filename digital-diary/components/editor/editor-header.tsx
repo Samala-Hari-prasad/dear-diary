@@ -1,11 +1,16 @@
 import { ChangeEvent } from "react";
+import { Heart, Archive } from "lucide-react";
 
 interface EditorHeaderProps {
   title: string;
   createdAt: string;
   tags: string[];
+  favorite?: boolean;
+  archived?: boolean;
   onTitleChange: (newTitle: string) => void;
   onTagsChange: (newTags: string[]) => void;
+  onFavoriteToggle?: () => void;
+  onArchiveToggle?: () => void;
   mode: "read" | "edit";
 }
 
@@ -13,8 +18,12 @@ export function EditorHeader({
   title,
   createdAt,
   tags,
+  favorite = false,
+  archived = false,
   onTitleChange,
   onTagsChange,
+  onFavoriteToggle,
+  onArchiveToggle,
   mode,
 }: EditorHeaderProps) {
   const formattedDate = new Date(createdAt).toLocaleDateString(undefined, {
@@ -25,7 +34,6 @@ export function EditorHeader({
   });
 
   const handleTagsTextChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // Split by comma and clean up spaces/empty tags
     const list = e.target.value
       .split(",")
       .map((t) => t.trim().replace(/^#/, ""))
@@ -35,20 +43,50 @@ export function EditorHeader({
 
   return (
     <div className="flex flex-col gap-3 border-b border-border/80 pb-6 mb-6 text-left">
-      {mode === "edit" ? (
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => onTitleChange(e.target.value)}
-          className="w-full bg-transparent border-none outline-none font-heading text-3xl font-light text-foreground placeholder:text-foreground/25 tracking-wide focus:ring-0 p-0 focus:outline-none"
-          placeholder="Untitled Memory"
-          aria-label="Memory Title"
-        />
-      ) : (
-        <h2 className="font-heading text-3xl font-light tracking-wide text-foreground leading-tight md:text-4xl">
-          {title || "Untitled Memory"}
-        </h2>
-      )}
+      <div className="flex items-center justify-between gap-4">
+        {mode === "edit" ? (
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => onTitleChange(e.target.value)}
+            className="flex-1 bg-transparent border-none outline-none font-heading text-3xl font-light text-foreground placeholder:text-foreground/25 tracking-wide focus:ring-0 p-0 focus:outline-none"
+            placeholder="Untitled Memory"
+            aria-label="Memory Title"
+          />
+        ) : (
+          <h2 className="font-heading text-3xl font-light tracking-wide text-foreground leading-tight md:text-4xl">
+            {title || "Untitled Memory"}
+          </h2>
+        )}
+
+        {/* Favorite & Archive Toggle Controls */}
+        <div className="flex gap-2 select-none">
+          {onFavoriteToggle && (
+            <button
+              type="button"
+              onClick={onFavoriteToggle}
+              className={`p-1.5 rounded-sm hover:bg-foreground/5 transition-colors ${
+                favorite ? "text-red-400" : "text-foreground/45"
+              }`}
+              aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Heart size={16} fill={favorite ? "currentColor" : "none"} strokeWidth={1.5} />
+            </button>
+          )}
+          {onArchiveToggle && (
+            <button
+              type="button"
+              onClick={onArchiveToggle}
+              className={`p-1.5 rounded-sm hover:bg-foreground/5 transition-colors ${
+                archived ? "text-yellow-600" : "text-foreground/45"
+              }`}
+              aria-label={archived ? "Unarchive memory" : "Archive memory"}
+            >
+              <Archive size={16} fill={archived ? "currentColor" : "none"} strokeWidth={1.5} />
+            </button>
+          )}
+        </div>
+      </div>
 
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4 text-xs text-foreground/50 tracking-wide">
         <time dateTime={createdAt} className="select-none">
@@ -73,7 +111,7 @@ export function EditorHeader({
               <span className="text-[10px] text-foreground/35 uppercase select-none">Tags:</span>
               <div className="flex gap-2">
                 {tags.map((tag) => (
-                  <span key={tag} className="bg-foreground/5 px-2 py-0.5 rounded-sm text-foreground/70 font-normal">
+                  <span key={tag} className="bg-foreground/5 px-2 py-0.5 rounded-sm text-foreground/70 font-normal font-sans">
                     #{tag}
                   </span>
                 ))}

@@ -98,6 +98,8 @@ export default function Home() {
             title: updatedPage.summary.title,
             tags: updatedPage.summary.tags,
             updatedAt: updatedPage.summary.updatedAt,
+            favorite: updatedPage.summary.favorite,
+            archived: updatedPage.summary.archived,
           };
         }
         return p;

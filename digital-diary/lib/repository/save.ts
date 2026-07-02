@@ -34,6 +34,8 @@ export async function saveEditorSession(
       cover: null, // Cover image management belongs to v0.7.0 Media Workspace
       updatedAt,
       tags: session.tags,
+      favorite: session.favorite,
+      archived: session.archived,
     },
     blocks: session.content,
   };

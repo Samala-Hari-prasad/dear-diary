@@ -5,4 +5,6 @@ export interface DiaryPageSummary {
   cover: string | null;
   updatedAt: string; // ISO String format
   tags: string[];
+  favorite?: boolean;
+  archived?: boolean;
 }

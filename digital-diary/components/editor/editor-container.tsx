@@ -134,6 +134,24 @@ export function EditorContainer({ session, onChange, onSaveSuccess }: EditorCont
     });
   };
 
+  const handleFavoriteToggle = () => {
+    handleSessionChange({
+      ...session,
+      favorite: !session.favorite,
+      isDirty: true,
+      updatedAt: new Date().toISOString(),
+    });
+  };
+
+  const handleArchiveToggle = () => {
+    handleSessionChange({
+      ...session,
+      archived: !session.archived,
+      isDirty: true,
+      updatedAt: new Date().toISOString(),
+    });
+  };
+
   const handleContentChange = (blocks: any[]) => {
     const internalBlocks = EditorAdapter.toStorageModel(blocks);
     handleSessionChange({
@@ -161,8 +179,12 @@ export function EditorContainer({ session, onChange, onSaveSuccess }: EditorCont
         title={session.title}
         createdAt={session.createdAt}
         tags={session.tags}
+        favorite={session.favorite}
+        archived={session.archived}
         onTitleChange={handleTitleChange}
         onTagsChange={handleTagsChange}
+        onFavoriteToggle={handleFavoriteToggle}
+        onArchiveToggle={handleArchiveToggle}
         mode={session.mode}
       />
 
