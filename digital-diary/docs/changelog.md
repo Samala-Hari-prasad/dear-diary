@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.6.0] - 2026-07-02
+### Added
+- Standardized `SyncStatus` state machine: `idle`, `pending`, `syncing`, `synced`, `conflict`.
+- Versioned sequential `SyncQueue` execution helper to coordinate back-to-back autosaves without queue congestion.
+- Debounced autosave mechanism executing automatically after 3 seconds of typing silence.
+- Optimistic state updates propagating title, tag, and updatedAt changes instantly to the page list container.
+- Passive footer status indicator in place of the manual save button controls.
+
 ## [v0.5.0] - 2026-07-02
 ### Added
 - Low-level writer service `writePageContent` to PUT files using GitHub Contents API.

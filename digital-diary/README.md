@@ -6,7 +6,7 @@ not a productivity app, not a dashboard, and not a note-taking SaaS product.
 
 ## Current Version
 
-v0.5.0
+v0.6.0
 
 ## Completed
 
@@ -15,10 +15,11 @@ v0.5.0
 - ✔ Repository Reader (Read-Only)
 - ✔ Memory Editor (Local Drafts)
 - ✔ Repository Writer (Write API & Indexes)
+- ✔ Synchronization Engine (Debounce, Sync Queue, Conflicts)
 
 ## Next
 
-- → Synchronization Engine (Debounce, Sync Queue, Conflicts)
+- → Media Workspace (WebP Conversion & GitHub Uploads)
 
 ## Stack
 
