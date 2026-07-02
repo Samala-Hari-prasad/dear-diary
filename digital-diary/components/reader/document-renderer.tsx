@@ -50,12 +50,12 @@ export function DocumentRenderer({ blocks }: DocumentRendererProps) {
           case "image":
             if (!block.content) return null;
             return (
-              <div key={block.id} className="w-full overflow-hidden rounded-sm border border-border bg-foreground/5 py-1">
+              <div key={block.id} className="w-full overflow-hidden rounded-sm border border-border bg-foreground/[0.01] flex justify-center py-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={block.content}
                   alt="Diary entry attachment"
-                  className="max-h-96 w-full object-cover rounded-sm transition-opacity duration-200"
+                  className="max-h-[500px] w-auto object-contain rounded-sm transition-opacity duration-200"
                   loading="lazy"
                 />
               </div>

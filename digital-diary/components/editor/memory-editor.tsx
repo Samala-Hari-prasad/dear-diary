@@ -3,6 +3,7 @@
 import { useTheme } from "next-themes";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
+import { uploadMedia } from "@/lib/media/uploader";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 
@@ -18,12 +19,16 @@ export default function MemoryEditor({
   editable,
 }: MemoryEditorProps) {
   const { resolvedTheme } = useTheme();
-  
+
   const editor = useCreateBlockNote({
     initialContent: initialContent && initialContent.length > 0 ? initialContent : undefined,
+    uploadFile: async (file) => {
+      // Resizes, converts to webp, and uploads directly via client-side uploader pipeline
+      const asset = await uploadMedia(file);
+      return asset.url;
+    },
   });
 
-  // Sync editor theme with application next-themes settings
   const currentTheme = resolvedTheme === "dark" ? "dark" : "light";
 
   return (

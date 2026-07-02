@@ -4,9 +4,10 @@ import { githubFetch } from "./client";
 
 interface WriteFileParams {
   path: string;
-  content: string; // Plain string content, we base64 encode it in this function
+  content: string;
   message: string;
   sha?: string;
+  contentEncoding?: "utf-8" | "base64";
 }
 
 export async function writeGitHubFile({
@@ -14,10 +15,14 @@ export async function writeGitHubFile({
   content,
   message,
   sha,
+  contentEncoding = "utf-8",
 }: WriteFileParams): Promise<{ sha: string }> {
   const { githubOwner: owner, githubRepo: repo, githubBranch: branch } = getEnvConfig();
 
-  const base64Content = Buffer.from(content, "utf-8").toString("base64");
+  const base64Content =
+    contentEncoding === "base64"
+      ? content
+      : Buffer.from(content, "utf-8").toString("base64");
 
   const body: Record<string, any> = {
     message,
