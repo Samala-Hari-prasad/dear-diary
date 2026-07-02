@@ -6,7 +6,7 @@ not a productivity app, not a dashboard, and not a note-taking SaaS product.
 
 ## Current Version
 
-v0.6.0
+v0.8.0
 
 ## Completed
 
@@ -16,10 +16,12 @@ v0.6.0
 - ✔ Memory Editor (Local Drafts)
 - ✔ Repository Writer (Write API & Indexes)
 - ✔ Synchronization Engine (Debounce, Sync Queue, Conflicts)
+- ✔ Media Workspace (WebP Conversion & GitHub Uploads)
+- ✔ Search Engine (Local Index Filtering)
 
 ## Next
 
-- → Media Workspace (WebP Conversion & GitHub Uploads)
+- → Calendar Timeline (Daily & Monthly Navigation)
 
 ## Stack
 

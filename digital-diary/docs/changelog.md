@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.8.0] - 2026-07-02
+### Added
+- Local search engine powered by `meta-index.json`.
+- String tokenization helper `tokenize` and ranked scoring matches helper `queryIndex`.
+- Repository search coordinator `searchRepository` with custom `SearchOptions`.
+- GET `/api/v1/search?q=...` API route.
+- Presentational `<SearchBar />` and `<EmptySearch />` components.
+- Instant client-side query indexing filters inside `<Sidebar />` for offline searching.
+
+## [v0.7.0] - 2026-07-02
+### Added
+- Native custom image attachments using client-side Canvas WebP compression.
+- Standardized `MediaAsset` model and configuration parameters (`MEDIA_CONFIG`).
+- Media uploader API coordinator `saveMediaAsset` to store compressed WebP files under `assets/images/{year}/{month}/`.
+- Extended binary support on low-level writer to handle raw base64 payloads without double encoding.
+- POST `/api/v1/diary/media` endpoint.
+- Custom BlockNote `uploadFile` hook configurations and document image renderer container styling.
+
 ## [v0.6.0] - 2026-07-02
 ### Added
 - Standardized `SyncStatus` state machine: `idle`, `pending`, `syncing`, `synced`, `conflict`.
