@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.9.0] - 2026-07-02
+### Added
+- Calendar domain layout models `CalendarSummary`.
+- Pure chronological filtering and grouping utilities `timeline.ts`.
+- Repository calendar service coordinator `getCalendarIndex`.
+- Minimalist monthly grid navigation component `<CalendarView />`.
+- Range query selector triggers `<QuickNavigation />` ("Today", "This Week", "This Month").
+- Tab controller inside sidebar container layout.
+
 ## [v0.8.0] - 2026-07-02
 ### Added
 - Local search engine powered by `meta-index.json`.

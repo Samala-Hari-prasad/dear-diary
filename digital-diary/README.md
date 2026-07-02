@@ -6,7 +6,7 @@ not a productivity app, not a dashboard, and not a note-taking SaaS product.
 
 ## Current Version
 
-v0.8.0
+v0.9.0
 
 ## Completed
 
@@ -18,10 +18,11 @@ v0.8.0
 - ✔ Synchronization Engine (Debounce, Sync Queue, Conflicts)
 - ✔ Media Workspace (WebP Conversion & GitHub Uploads)
 - ✔ Search Engine (Local Index Filtering)
+- ✔ Calendar Timeline (Daily & Monthly Navigation)
 
 ## Next
 
-- → Calendar Timeline (Daily & Monthly Navigation)
+- → Collections & Organization (Archive, Tags & Favorites)
 
 ## Stack
 
