@@ -24,3 +24,16 @@ The permanent repository format shall never be the native serialization format o
 ### Consequences
 - BlockNote or any editor component can be modified or fully replaced in the future without requiring migration of stored diary entries.
 - The storage format remains clean, standardized, and fully portable.
+
+## ADR-010: Repository Write Orchestration
+
+### Context
+Saving a diary page requires multiple repository updates (e.g. writing the content file, updating index lists).
+
+### Decision
+All save operations must pass exclusively through a centralized save coordinator (`lib/repository/save.ts`). Low-level GitHub services (`write.ts` and `index-writer.ts`) remain single-purpose and must never invoke each other directly.
+
+### Consequences
+- Repository pipeline logic remains centralized and decoupled.
+- Low-level write utilities remain single-purpose and reusable.
+- Future autosave, retry queues, and offline synchronization mechanisms can reuse the same save coordinator without restructuring database layers.

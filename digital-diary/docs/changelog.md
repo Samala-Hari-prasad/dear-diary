@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.5.0] - 2026-07-02
+### Added
+- Low-level writer service `writePageContent` to PUT files using GitHub Contents API.
+- Low-level index writer `updateIndexFiles` to update the meta-index JSON list.
+- Centralized transaction coordinator `saveEditorSession` to enforce write sequencing.
+- Standardized POST API route `/api/v1/diary/pages/save` with CONFLICT error mappings.
+- Custom `<SaveButton />` with Loading, Saved, and Conflict feedback loops.
+
 ## [v0.4.0] - 2026-07-02
 ### Added
 - Rich-text editor capability using BlockNote with Mantine core styling (compatibly aligned to v7).
