@@ -1,34 +1,33 @@
 # The Digital Diary
 
-A private, Korean-minimalist digital diary. The application is designed to feel
-like opening a beautiful paper notebook — calm, elegant, and timeless. It is
-not a productivity app, not a dashboard, and not a note-taking SaaS product.
+A private, Korean-minimalist digital diary. The application is designed to feel like opening a beautiful paper notebook: calm, elegant, and timeless. It is not a productivity app, not a dashboard, and not a note-taking SaaS product.
 
 ## Current Version
 
-v0.10.0
+v1.0.0
 
 ## Completed
 
-- ✔ Visual Shell
-- ✔ Repository Connection
-- ✔ Repository Reader (Read-Only)
-- ✔ Memory Editor (Local Drafts)
-- ✔ Repository Writer (Write API & Indexes)
-- ✔ Synchronization Engine (Debounce, Sync Queue, Conflicts)
-- ✔ Media Workspace (WebP Conversion & GitHub Uploads)
-- ✔ Search Engine (Local Index Filtering)
-- ✔ Calendar Timeline (Daily & Monthly Navigation)
-- ✔ Collections & Organization (Archive, Tags & Favorites)
+- Visual Shell
+- Repository Connection
+- Repository Reader (Read-Only)
+- Memory Editor (Local Drafts)
+- Repository Writer (Write API and Indexes)
+- Synchronization Engine (Debounce, Sync Queue, Conflicts)
+- Media Workspace (WebP Conversion and GitHub Uploads)
+- Search Engine (Local Index Filtering)
+- Calendar Timeline (Daily and Monthly Navigation)
+- Collections and Organization (Archive, Tags, and Favorites)
+- Production Hardening (Accessibility, Stability, QA)
 
 ## Next
 
-- → Production Hardening & Polish (Accessibility, Stability, QA)
+- Authentication and Security (GitHub OAuth and Cookie Sessions)
 
 ## Stack
 
 - Next.js 15 (App Router)
-- TypeScript (strict mode)
+- TypeScript
 - Tailwind CSS
 - next-themes
 - lucide-react
@@ -40,23 +39,23 @@ npm install
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000).
+Then open http://localhost:3000.
 
 ## Project Structure
 
-```
-app/                  Routes, root layout, global styles
-components/layout/    Structural components (header, sidebar, shell)
-components/ui/        Reusable primitives (button, card, theme toggle)
-constants/            Design tokens and app-level constants
-docs/                 Project documentation for contributors and agents
-public/               Static assets
+```text
+dear-diary/
+├── app/                  Routes, root layout, and API routes
+├── components/           Layout views, sidebar, search, and calendar panels
+├── constants/            Design tokens and app-level constants
+├── docs/                 Changelogs, API specs, and storage formats
+├── lib/                  Services, API clients, and query tokenizers
+├── public/               Static assets
+└── README.md
 ```
 
 ## Documentation
 
-- `docs/INDEX.md` — documentation map
-- `docs/constitution.md` — non-negotiable project principles
-- `docs/design-system.md` — typography, color, spacing, and motion rules
-- `docs/definition-of-done.md` — scope and completion criteria for v0.1.0
-- `AGENTS.md` — guidance for AI agents continuing development
+- docs/api-reference.md: REST endpoint payload formats and shapes.
+- docs/repository-format.md: Repository database folder layouts and meta index schemas.
+- docs/changelog.md: Historical release version change logs.
