@@ -37,3 +37,20 @@ All save operations must pass exclusively through a centralized save coordinator
 - Repository pipeline logic remains centralized and decoupled.
 - Low-level write utilities remain single-purpose and reusable.
 - Future autosave, retry queues, and offline synchronization mechanisms can reuse the same save coordinator without restructuring database layers.
+
+## ADR-011: Automatic Background Synchronization
+
+### Context
+Manual save actions interrupt user writing flow. We want changes to persist in the background reliably while protecting data integrity.
+
+### Decision
+Synchronization is performed automatically after a 3-second debounce using a generic sequential task queue.
+- Only one synchronization request may execute simultaneously.
+- Queued snapshots replace obsolete pending snapshots.
+- Synchronization never cancels an active save (awaits completion, then executes the newest snapshot).
+- Synchronization conflicts never discard local editor state.
+
+### Consequences
+- Writing remains uninterrupted while repository consistency is maintained.
+- Data integrity is protected via sequential, non-overlapping saves and SHA conflict checking.
+- Obsolete intermediate writes are discarded, minimizing API depletion rate.
