@@ -9,5 +9,5 @@
 - [x] v0.7.0 Media Workspace
 - [x] v0.8.0 Search Engine
 - [x] v0.9.0 Calendar Timeline
-- [ ] v0.10.0 Collections & Organization
+- [x] v0.10.0 Collections & Organization
 - [ ] v1.0.0 Stable Production

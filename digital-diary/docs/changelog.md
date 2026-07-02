@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.10.0] - 2026-07-02
+### Added
+- Standardized `favorite` and `archived` flags support on models (`DiaryPageSummary`, `EditorSession`).
+- Organization query filtering facade `repository-organization.ts`.
+- Standard presentation tag badge list `<TagList />` and default directory links `<CollectionsView />`.
+- Context toggles for favorites/archive next to title blocks inside `<EditorHeader />`.
+- Clean folder listings integration tab switcher in sidebar.
+
 ## [v0.9.0] - 2026-07-02
 ### Added
 - Calendar domain layout models `CalendarSummary`.

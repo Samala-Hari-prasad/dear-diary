@@ -6,7 +6,7 @@ not a productivity app, not a dashboard, and not a note-taking SaaS product.
 
 ## Current Version
 
-v0.9.0
+v0.10.0
 
 ## Completed
 
@@ -19,10 +19,11 @@ v0.9.0
 - ✔ Media Workspace (WebP Conversion & GitHub Uploads)
 - ✔ Search Engine (Local Index Filtering)
 - ✔ Calendar Timeline (Daily & Monthly Navigation)
+- ✔ Collections & Organization (Archive, Tags & Favorites)
 
 ## Next
 
-- → Collections & Organization (Archive, Tags & Favorites)
+- → Production Hardening & Polish (Accessibility, Stability, QA)
 
 ## Stack
 
