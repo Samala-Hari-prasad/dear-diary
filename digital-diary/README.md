@@ -6,16 +6,18 @@ not a productivity app, not a dashboard, and not a note-taking SaaS product.
 
 ## Current Version
 
-v0.2.0
+v0.4.0
 
 ## Completed
 
 - ✔ Visual Shell
 - ✔ Repository Connection
+- ✔ Repository Reader (Read-Only)
+- ✔ Memory Editor (Local Drafts)
 
 ## Next
 
-- → Repository Reading (Read-Only)
+- → Repository Writer (Write API & Indexes)
 
 ## Stack
 

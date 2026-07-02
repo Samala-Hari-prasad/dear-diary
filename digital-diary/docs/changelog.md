@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.4.0] - 2026-07-02
+### Added
+- Rich-text editor capability using BlockNote with Mantine core styling (compatibly aligned to v7).
+- Extensible `EditorSession` to bundle page selection parameters, dates, and block state.
+- Isolation Adapter layer (`lib/editor/adapter.ts`, `serializer.ts`, `deserializer.ts`) separating editing canvas schemas from repository models.
+- Quiet presentational `<EditorStatus />` bar, dynamic dynamic SSR `<EditorContainer />`, and Title/Tag inputs `<EditorHeader />`.
+- Toggles in `<PageView />` supporting seamless transition between preview (read) and write (edit) states.
+- Local drafts creation when clicked "New Memory" in the app interface.
+
 ## [v0.3.0] - 2026-07-01
 ### Added
 - central database services for loading manifest, meta-indexes, and pages.
