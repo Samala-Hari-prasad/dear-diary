@@ -13,4 +13,5 @@ export interface DocumentBlock {
 export interface DiaryPage {
   summary: DiaryPageSummary;
   blocks: DocumentBlock[];
+  sha?: string;
 }

@@ -9,4 +9,5 @@ export interface EditorSession {
   mode: "read" | "edit";
   createdAt: string;
   updatedAt: string;
+  sha?: string;
 }

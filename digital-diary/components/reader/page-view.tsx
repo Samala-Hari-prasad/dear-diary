@@ -92,7 +92,26 @@ export function PageView({ page, onPageUpdate }: PageViewProps) {
       </div>
 
       {mode === "edit" && session ? (
-        <EditorContainer session={session} onChange={setSession} />
+        <EditorContainer
+          session={session}
+          onChange={setSession}
+          onSaveSuccess={(newSlug) => {
+            if (onPageUpdate) {
+              onPageUpdate({
+                summary: {
+                  id: newSlug,
+                  slug: newSlug,
+                  title: session.title,
+                  cover: page.summary.cover,
+                  updatedAt: session.updatedAt,
+                  tags: session.tags,
+                },
+                blocks: session.content,
+                sha: session.sha,
+              });
+            }
+          }}
+        />
       ) : (
         <>
           {/* Cover Image */}

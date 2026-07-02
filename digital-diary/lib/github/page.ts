@@ -40,5 +40,6 @@ export async function loadPage(slug: string): Promise<DiaryPage> {
       tags: Array.isArray(parsed.summary.tags) ? parsed.summary.tags : [],
     },
     blocks: parsed.blocks,
+    sha: metadata.sha,
   };
 }
