@@ -28,34 +28,41 @@ export function PageView({ page, onPageUpdate }: PageViewProps) {
       mode: "read",
       createdAt: page.summary.updatedAt,
       updatedAt: page.summary.updatedAt,
+      sha: page.sha,
     });
     setMode("read");
   }, [page]);
+
+  const handleSessionChange = (updatedSession: EditorSession) => {
+    setSession(updatedSession);
+
+    // Rule: Optimistic updates to title, tags, updatedAt. NEVER update sha optimistically.
+    if (onPageUpdate) {
+      onPageUpdate({
+        summary: {
+          id: updatedSession.pageId || page.summary.id,
+          slug: page.summary.slug,
+          title: updatedSession.title,
+          cover: page.summary.cover,
+          updatedAt: updatedSession.updatedAt,
+          tags: updatedSession.tags,
+        },
+        blocks: updatedSession.content,
+        sha: page.sha, // Maintain loaded SHA for concurrency
+      });
+    }
+  };
 
   const handleToggleMode = () => {
     if (mode === "read") {
       setMode("edit");
       if (session) {
-        setSession({ ...session, mode: "edit" });
+        handleSessionChange({ ...session, mode: "edit" });
       }
     } else {
       setMode("read");
       if (session) {
-        setSession({ ...session, mode: "read" });
-        // Notify parent of local change state (for sidebar/metadata sync in v0.4.0)
-        if (onPageUpdate) {
-          onPageUpdate({
-            summary: {
-              id: session.pageId || page.summary.id,
-              slug: page.summary.slug,
-              title: session.title,
-              cover: page.summary.cover,
-              updatedAt: session.updatedAt,
-              tags: session.tags,
-            },
-            blocks: session.content,
-          });
-        }
+        handleSessionChange({ ...session, mode: "read" });
       }
     }
   };
@@ -94,8 +101,9 @@ export function PageView({ page, onPageUpdate }: PageViewProps) {
       {mode === "edit" && session ? (
         <EditorContainer
           session={session}
-          onChange={setSession}
+          onChange={handleSessionChange}
           onSaveSuccess={(newSlug) => {
+            // Confirm the new SHA and slug on successful write transaction
             if (onPageUpdate) {
               onPageUpdate({
                 summary: {
