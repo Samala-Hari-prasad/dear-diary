@@ -112,6 +112,8 @@ export function CalendarView({ pages, selectedDate, onSelectDate }: CalendarView
               key={dateKey}
               type="button"
               onClick={() => onSelectDate(isSelected ? null : dateKey)}
+              aria-label={`Select date ${dateKey}`}
+              aria-pressed={isSelected}
               className={`relative flex h-7 w-7 mx-auto items-center justify-center rounded-sm transition-all duration-150 ${
                 isSelected
                   ? "bg-foreground text-background font-medium"

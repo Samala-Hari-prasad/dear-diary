@@ -24,6 +24,7 @@ export function PageList({ pages, selectedSlug, onSelect }: PageListProps) {
             <button
               type="button"
               onClick={() => onSelect(page.slug)}
+              aria-current={isSelected ? "page" : undefined}
               className={`w-full flex flex-col items-start gap-1 rounded-sm px-3 py-2 text-left transition-colors duration-200 ease-out ${
                 isSelected
                   ? "bg-accent text-background"

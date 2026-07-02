@@ -126,9 +126,13 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
     <aside className="hidden w-56 shrink-0 border-r border-border px-6 py-8 md:block overflow-y-auto max-h-[calc(100vh-64px)]">
       <nav aria-label="Primary" className="flex flex-col gap-6">
         {/* Navigation Tabs Header */}
-        <div className="flex border-b border-border/60 pb-1 select-none">
+        <div role="tablist" aria-label="Navigation modes" className="flex border-b border-border/60 pb-1 select-none">
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "search"}
+            aria-controls="panel-search"
+            id="tab-search"
             onClick={() => setActiveTab("search")}
             className={`flex-1 text-center pb-2 text-[11px] font-medium transition-all duration-200 border-b ${
               activeTab === "search"
@@ -140,6 +144,10 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
           </button>
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "collections"}
+            aria-controls="panel-collections"
+            id="tab-collections"
             onClick={() => setActiveTab("collections")}
             className={`flex-1 text-center pb-2 text-[11px] font-medium transition-all duration-200 border-b ${
               activeTab === "collections"
@@ -151,6 +159,10 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
           </button>
           <button
             type="button"
+            role="tab"
+            aria-selected={activeTab === "calendar"}
+            aria-controls="panel-calendar"
+            id="tab-calendar"
             onClick={() => setActiveTab("calendar")}
             className={`flex-1 text-center pb-2 text-[11px] font-medium transition-all duration-200 border-b ${
               activeTab === "calendar"
@@ -164,7 +176,7 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
 
         {/* Tab Panel contents */}
         {activeTab === "search" && (
-          <div className="flex flex-col gap-6">
+          <div id="panel-search" role="tabpanel" aria-labelledby="tab-search" className="flex flex-col gap-6">
             <div className="px-1 select-none">
               <SearchBar value={searchQuery} onChange={setSearchQuery} />
             </div>
@@ -186,7 +198,7 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
         )}
 
         {activeTab === "collections" && (
-          <div className="flex flex-col gap-6">
+          <div id="panel-collections" role="tabpanel" aria-labelledby="tab-collections" className="flex flex-col gap-6">
             <div className="px-1">
               <CollectionsView
                 activeFilter={collectionFilter}
@@ -220,7 +232,7 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
         )}
 
         {activeTab === "calendar" && (
-          <div className="flex flex-col gap-6">
+          <div id="panel-calendar" role="tabpanel" aria-labelledby="tab-calendar" className="flex flex-col gap-6">
             <div className="px-1">
               <CalendarView
                 pages={activePages}
