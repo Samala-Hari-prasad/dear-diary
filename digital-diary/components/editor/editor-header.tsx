@@ -1,0 +1,87 @@
+import { ChangeEvent } from "react";
+
+interface EditorHeaderProps {
+  title: string;
+  createdAt: string;
+  tags: string[];
+  onTitleChange: (newTitle: string) => void;
+  onTagsChange: (newTags: string[]) => void;
+  mode: "read" | "edit";
+}
+
+export function EditorHeader({
+  title,
+  createdAt,
+  tags,
+  onTitleChange,
+  onTagsChange,
+  mode,
+}: EditorHeaderProps) {
+  const formattedDate = new Date(createdAt).toLocaleDateString(undefined, {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const handleTagsTextChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // Split by comma and clean up spaces/empty tags
+    const list = e.target.value
+      .split(",")
+      .map((t) => t.trim().replace(/^#/, ""))
+      .filter((t) => t.length > 0);
+    onTagsChange(list);
+  };
+
+  return (
+    <div className="flex flex-col gap-3 border-b border-border/80 pb-6 mb-6 text-left">
+      {mode === "edit" ? (
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => onTitleChange(e.target.value)}
+          className="w-full bg-transparent border-none outline-none font-heading text-3xl font-light text-foreground placeholder:text-foreground/25 tracking-wide focus:ring-0 p-0 focus:outline-none"
+          placeholder="Untitled Memory"
+          aria-label="Memory Title"
+        />
+      ) : (
+        <h2 className="font-heading text-3xl font-light tracking-wide text-foreground leading-tight md:text-4xl">
+          {title || "Untitled Memory"}
+        </h2>
+      )}
+
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4 text-xs text-foreground/50 tracking-wide">
+        <time dateTime={createdAt} className="select-none">
+          {formattedDate}
+        </time>
+
+        {mode === "edit" ? (
+          <div className="flex items-center gap-2 border-l border-border/60 pl-0 md:pl-4">
+            <span className="text-[10px] text-foreground/35 uppercase select-none">Tags:</span>
+            <input
+              type="text"
+              value={tags.map((t) => `#${t}`).join(", ")}
+              onChange={handleTagsTextChange}
+              className="bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0 w-64 text-foreground/70 placeholder:text-foreground/20"
+              placeholder="e.g. #personal, #milestone"
+              aria-label="Tags (comma separated)"
+            />
+          </div>
+        ) : (
+          tags.length > 0 && (
+            <div className="flex items-center gap-2 border-l border-border/60 pl-0 md:pl-4">
+              <span className="text-[10px] text-foreground/35 uppercase select-none">Tags:</span>
+              <div className="flex gap-2">
+                {tags.map((tag) => (
+                  <span key={tag} className="bg-foreground/5 px-2 py-0.5 rounded-sm text-foreground/70 font-normal">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  );
+}

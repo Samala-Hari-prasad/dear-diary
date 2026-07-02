@@ -51,6 +51,60 @@ export default function Home() {
     }
   };
 
+  const handleNewMemory = () => {
+    const draftId = "draft-" + Date.now();
+    const draftSlug = "new-memory-" + Date.now();
+    const newPage: DiaryPage = {
+      summary: {
+        id: draftId,
+        slug: draftSlug,
+        title: "Untitled Memory",
+        cover: null,
+        updatedAt: new Date().toISOString(),
+        tags: [],
+      },
+      blocks: [
+        {
+          id: "initial-block",
+          type: "paragraph",
+          content: "Begin writing...",
+        },
+      ],
+    };
+
+    // Prepend draft summary to lists so it shows up in sidebar
+    const draftSummary: DiaryPageSummary = {
+      id: draftId,
+      slug: draftSlug,
+      title: "Untitled Memory",
+      cover: null,
+      updatedAt: newPage.summary.updatedAt,
+      tags: [],
+    };
+
+    setPages([draftSummary, ...pages]);
+    setSelectedSlug(draftSlug);
+    setSelectedPage(newPage);
+  };
+
+  const handlePageUpdate = (updatedPage: DiaryPage) => {
+    setSelectedPage(updatedPage);
+    // Update summary in index list
+    setPages(
+      pages.map((p) => {
+        if (p.slug === updatedPage.summary.slug) {
+          return {
+            ...p,
+            title: updatedPage.summary.title,
+            tags: updatedPage.summary.tags,
+            updatedAt: updatedPage.summary.updatedAt,
+          };
+        }
+        return p;
+      })
+    );
+  };
+
   useEffect(() => {
     fetchIndex();
   }, []);
@@ -78,7 +132,13 @@ export default function Home() {
             <div className="w-full h-40 bg-foreground/5 rounded-sm border border-border" />
           </div>
         ) : pages.length === 0 ? (
-          <EmptyState type="empty-repo" />
+          <div className="flex flex-col items-center gap-12">
+            <Button type="button" onClick={handleNewMemory}>
+              <Plus size={16} strokeWidth={1.5} aria-hidden="true" />
+              {NEW_MEMORY_LABEL}
+            </Button>
+            <EmptyState type="empty-repo" />
+          </div>
         ) : loadingPage ? (
           <div className="w-full flex flex-col gap-6 animate-pulse text-left py-6">
             <div className="w-2/3 h-10 bg-foreground/10 rounded-sm" />
@@ -91,7 +151,7 @@ export default function Home() {
             </div>
           </div>
         ) : selectedPage ? (
-          <PageView page={selectedPage} />
+          <PageView page={selectedPage} onPageUpdate={handlePageUpdate} />
         ) : (
           <div className="flex flex-col items-center gap-12">
             {/* Tagline section if no selected page */}
@@ -100,7 +160,7 @@ export default function Home() {
                 Every memory deserves a place.
               </h2>
             </div>
-            <Button type="button" disabled className="opacity-40 cursor-not-allowed">
+            <Button type="button" onClick={handleNewMemory}>
               <Plus size={16} strokeWidth={1.5} aria-hidden="true" />
               {NEW_MEMORY_LABEL}
             </Button>
