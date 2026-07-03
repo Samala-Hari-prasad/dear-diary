@@ -6,7 +6,7 @@ export async function githubFetch(path: string, options: RequestInit = {}): Prom
 
   const url = `https://api.github.com${path}`;
   const headers = {
-    Authorization: `Bearer ${config.githubPat}`,
+    Authorization: `Bearer ${config.githubToken}`,
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
     "User-Agent": "the-digital-diary",
