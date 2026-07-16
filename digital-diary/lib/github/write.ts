@@ -55,3 +55,34 @@ export async function writeGitHubFile({
     sha: data.content?.sha || "",
   };
 }
+
+export async function deleteGitHubFile(
+  path: string,
+  message: string,
+  sha: string
+): Promise<void> {
+  const { githubOwner: owner, githubRepo: repo, githubBranch: branch } = getEnvConfig();
+
+  const body = {
+    message,
+    sha,
+    branch,
+  };
+
+  const res = await githubFetch(`/repos/${owner}/${repo}/contents/${path}`, {
+    method: "DELETE",
+    body: JSON.stringify(body),
+  });
+
+  if (res.status === 404) {
+    // Already deleted
+    return;
+  }
+
+  if (!res.ok) {
+    const errorBody = await res.json().catch(() => ({}));
+    throw new Error(
+      `DELETE_FAILED: ${res.status} - ${errorBody.message || "Unknown error"}`
+    );
+  }
+}
