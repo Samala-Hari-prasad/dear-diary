@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen } from "lucide-react";
+import { openOrCreateMemory } from "@/lib/client/memory-client";
+import { BookOpen, Plus } from "lucide-react";
 import { DiaryPageSummary } from "@/types/models/diary-summary";
+import { today } from "@/lib/utils/date";
 import { PageList } from "@/components/reader/page-list";
 import { SearchBar } from "@/components/search/search-bar";
 import { EmptySearch } from "@/components/search/empty-search";
@@ -96,10 +98,22 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
     }
   }
 
-  const handleSelectDate = (date: string | null) => {
+  const handleSelectDate = async (date: string | null) => {
     setSelectedDate(date);
     if (date !== null) {
       setTimeFilter("all");
+      
+      const existing = pages.find((p) => (p.date || formatDateKey(p.updatedAt)) === date);
+      if (existing) {
+        onSelect(existing.slug);
+      } else {
+        try {
+          const result = await openOrCreateMemory(date);
+          onSelect(result.slug);
+        } catch (err) {
+          console.error("Failed to open or create memory", err);
+        }
+      }
     }
   };
 
@@ -122,9 +136,27 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
   const favoritesCount = getFavoritePages(pages).length;
   const archiveCount = getArchivedPages(pages).length;
 
+  const handleNewMemory = async () => {
+    try {
+      const result = await openOrCreateMemory(today());
+      onSelect(result.slug);
+    } catch (err) {
+      console.error("Failed to create new memory", err);
+    }
+  };
+
   return (
     <aside className="hidden w-56 shrink-0 border-r border-border px-6 py-8 md:block overflow-y-auto max-h-[calc(100vh-64px)]">
       <nav aria-label="Primary" className="flex flex-col gap-6">
+        <button
+          type="button"
+          onClick={handleNewMemory}
+          className="flex w-full items-center justify-center gap-2 rounded bg-foreground py-2 text-sm font-medium text-background transition-all hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2 select-none shadow-sm"
+        >
+          <Plus size={16} />
+          New Memory
+        </button>
+
         {/* Navigation Tabs Header */}
         <div role="tablist" aria-label="Navigation modes" className="flex border-b border-border/60 pb-1 select-none">
           <button
