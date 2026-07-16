@@ -8,6 +8,9 @@ import { EditorStatus, SyncStatus } from "./editor-status";
 import { EditorAdapter } from "@/lib/editor/adapter";
 import { debounce } from "@/lib/editor/debounce";
 import { SyncQueue, SyncTask } from "@/lib/editor/sync-queue";
+import { useRouter } from "next/navigation";
+import { DeleteDialog } from "@/components/ui/delete-dialog";
+import { deleteMemoryApi } from "@/lib/client/memory-client";
 
 // Dynamic import of BlockNote canvas to prevent SSR hydration errors
 const MemoryEditorCanvas = dynamic(() => import("./memory-editor"), {
@@ -31,6 +34,9 @@ export function EditorContainer({ session, onChange, onSaveSuccess }: EditorCont
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
   const [queue] = useState(() => new SyncQueue());
   const [taskVersion, setTaskVersion] = useState(0);
+  const router = useRouter();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Keep latest session in ref to avoid recreating the debounced handler
   const latestSessionRef = useRef(session);
@@ -116,6 +122,23 @@ export function EditorContainer({ session, onChange, onSaveSuccess }: EditorCont
     triggerSync();
   };
 
+  const handleDelete = async () => {
+    if (!session.pageId || session.pageId.startsWith("draft-")) {
+      router.push("/");
+      return;
+    }
+    
+    setIsDeleting(true);
+    try {
+      await deleteMemoryApi(session.pageId);
+      router.push("/");
+    } catch (err: any) {
+      alert(err.message || "Failed to delete memory");
+      setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
   const handleTitleChange = (newTitle: string) => {
     handleSessionChange({
       ...session,
@@ -185,6 +208,7 @@ export function EditorContainer({ session, onChange, onSaveSuccess }: EditorCont
         onTagsChange={handleTagsChange}
         onFavoriteToggle={handleFavoriteToggle}
         onArchiveToggle={handleArchiveToggle}
+        onDelete={() => setIsDeleteDialogOpen(true)}
         mode={session.mode}
       />
 
@@ -199,6 +223,14 @@ export function EditorContainer({ session, onChange, onSaveSuccess }: EditorCont
 
       {/* Editor Status */}
       <EditorStatus status={syncStatus} mode={session.mode} />
+
+      <DeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDelete}
+        title={session.title || "Untitled Memory"}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
