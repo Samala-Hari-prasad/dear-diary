@@ -44,7 +44,10 @@ export async function loadMetaIndex(): Promise<DiaryPageSummary[]> {
     title: p.title,
     cover: p.cover || null,
     updatedAt: p.updatedAt,
+    date: p.date,
     tags: Array.isArray(p.tags) ? p.tags : [],
+    favorite: p.favorite,
+    archived: p.archived,
   }));
 
   pages.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());

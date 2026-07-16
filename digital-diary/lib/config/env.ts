@@ -1,6 +1,6 @@
 import "server-only";
 
-function getRequiredEnv(key: string): string {
+export function getRequiredEnv(key: string): string {
   const value = process.env[key];
   if (!value) {
     throw new Error(`Missing environment variable: ${key}`);

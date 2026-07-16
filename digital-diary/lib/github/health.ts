@@ -130,7 +130,8 @@ export async function checkSystemStatus(): Promise<RepositoryHealth> {
     let repoRes;
     try {
       repoRes = await githubFetch(`/repos/${owner}/${repo}`);
-    } catch {
+    } catch (e: any) {
+      console.error("Health Check Network Error:", e);
       pushDiagnostic(diagnostics, RepositoryErrorCode.NETWORK_ERROR);
       return { healthy: false, version, timestamp, diagnostics };
     }
