@@ -62,6 +62,7 @@ export default function Home() {
         slug: draftSlug,
         title: "Untitled Memory",
         cover: null,
+        date: new Date().toISOString().slice(0, 10), // Will use today() helper in Slice 2
         updatedAt: new Date().toISOString(),
         tags: [],
       },
@@ -80,6 +81,7 @@ export default function Home() {
       slug: draftSlug,
       title: "Untitled Memory",
       cover: null,
+      date: new Date().toISOString().slice(0, 10), // Will use today() helper in Slice 2
       updatedAt: newPage.summary.updatedAt,
       tags: [],
     };

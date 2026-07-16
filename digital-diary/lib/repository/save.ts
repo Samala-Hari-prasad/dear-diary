@@ -4,6 +4,7 @@ import { DiaryPage } from "@/types/models/diary-page";
 import { writeGitHubFile } from "@/lib/github/write";
 import { updateIndexFiles } from "@/lib/github/index-writer";
 import { loadMetaIndex } from "@/lib/github/index";
+import { formatDateKey } from "@/lib/utils/date";
 
 function generateSlug(title: string): string {
   const base = title
@@ -49,7 +50,7 @@ export async function saveEditorSession(
       slug: slug,
       title: session.title || "Untitled Memory",
       cover: null, // Cover image management belongs to v0.7.0 Media Workspace
-      date: session.date,
+      date: session.date || formatDateKey(updatedAt),
       updatedAt,
       tags: session.tags,
       favorite: session.favorite,
