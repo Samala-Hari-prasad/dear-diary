@@ -2,6 +2,7 @@ import "server-only";
 import { getEnvConfig } from "@/lib/config/env";
 import { githubFetch } from "./client";
 import { DiaryPage } from "@/types/models/diary-page";
+import { formatDateKey } from "@/lib/utils/date";
 
 export async function loadPage(slug: string): Promise<DiaryPage> {
   const { githubOwner: owner, githubRepo: repo, githubBranch: branch } = getEnvConfig();
@@ -36,6 +37,7 @@ export async function loadPage(slug: string): Promise<DiaryPage> {
       slug: parsed.summary.slug,
       title: parsed.summary.title,
       cover: parsed.summary.cover || null,
+      date: parsed.summary.date || formatDateKey(parsed.summary.updatedAt),
       updatedAt: parsed.summary.updatedAt,
       tags: Array.isArray(parsed.summary.tags) ? parsed.summary.tags : [],
     },

@@ -3,6 +3,8 @@ import { getEnvConfig } from "@/lib/config/env";
 import { githubFetch } from "./client";
 import { DiaryPageSummary } from "@/types/models/diary-summary";
 
+import { normalizeMetaIndex, RawMetaIndex } from "../repository/normalize";
+
 let cachedIndex: DiaryPageSummary[] | null = null;
 let indexCacheTime = 0;
 const INDEX_CACHE_TTL = 30 * 1000; // 30 seconds
@@ -31,14 +33,16 @@ export async function loadMetaIndex(): Promise<DiaryPageSummary[]> {
   }
 
   const rawContent = Buffer.from(metadata.content, "base64").toString("utf-8");
-  const parsed = JSON.parse(rawContent);
+  const parsed = JSON.parse(rawContent) as RawMetaIndex;
 
   if (!parsed || !Array.isArray(parsed.pages)) {
     throw new Error("META_INDEX_INVALID");
   }
 
+  const normalizedIndex = normalizeMetaIndex(parsed);
+
   // Map and sort pages by updatedAt (descending) so newest memories are first
-  const pages: DiaryPageSummary[] = parsed.pages.map((p: any) => ({
+  const pages: DiaryPageSummary[] = normalizedIndex.pages.map((p) => ({
     id: p.id,
     slug: p.slug,
     title: p.title,
