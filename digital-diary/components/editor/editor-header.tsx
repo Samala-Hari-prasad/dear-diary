@@ -1,5 +1,5 @@
 import { ChangeEvent } from "react";
-import { Heart, Archive } from "lucide-react";
+import { Heart, Archive, Trash2 } from "lucide-react";
 
 interface EditorHeaderProps {
   title: string;
@@ -11,6 +11,7 @@ interface EditorHeaderProps {
   onTagsChange: (newTags: string[]) => void;
   onFavoriteToggle?: () => void;
   onArchiveToggle?: () => void;
+  onDelete?: () => void;
   mode: "read" | "edit";
 }
 
@@ -24,6 +25,7 @@ export function EditorHeader({
   onTagsChange,
   onFavoriteToggle,
   onArchiveToggle,
+  onDelete,
   mode,
 }: EditorHeaderProps) {
   const formattedDate = new Date(createdAt).toLocaleDateString(undefined, {
@@ -83,6 +85,16 @@ export function EditorHeader({
               aria-label={archived ? "Unarchive memory" : "Archive memory"}
             >
               <Archive size={16} fill={archived ? "currentColor" : "none"} strokeWidth={1.5} />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="p-1.5 rounded-sm hover:bg-red-500/10 text-foreground/45 hover:text-red-500 transition-colors ml-2"
+              aria-label="Delete memory"
+            >
+              <Trash2 size={16} strokeWidth={1.5} />
             </button>
           )}
         </div>

@@ -7,6 +7,8 @@ import { DocumentRenderer } from "./document-renderer";
 import { EditorContainer } from "@/components/editor/editor-container";
 import { EditorSession } from "@/types/models/editor-document";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
+import { changeDateApi } from "@/lib/client/memory-client";
 
 interface PageViewProps {
   page: DiaryPage;
@@ -86,12 +88,29 @@ export function PageView({ page, onPageUpdate }: PageViewProps) {
     }
   };
 
-  const formattedDate = new Date(page.summary.updatedAt).toLocaleDateString(undefined, {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const [isChangingDate, setIsChangingDate] = useState(false);
+
+  const handleChangeDate = async (newDate: string) => {
+    if (newDate === page.summary.date) return;
+    setIsChangingDate(true);
+    try {
+      await changeDateApi(page.summary.slug, newDate);
+      if (onPageUpdate) {
+        onPageUpdate({
+          summary: {
+            ...page.summary,
+            date: newDate,
+          },
+          blocks: page.blocks,
+          sha: page.sha,
+        });
+      }
+    } catch (err: any) {
+      alert(err.message || "Failed to change date");
+    } finally {
+      setIsChangingDate(false);
+    }
+  };
 
   return (
     <article className="w-full flex flex-col gap-6 text-left">
@@ -163,7 +182,11 @@ export function PageView({ page, onPageUpdate }: PageViewProps) {
               {session?.title || page.summary.title}
             </h2>
             <div className="flex flex-wrap items-center gap-3 text-xs text-foreground/50 tracking-wide">
-              <time dateTime={page.summary.updatedAt}>{formattedDate}</time>
+              <DatePicker 
+                value={session?.date || page.summary.date}
+                onChange={handleChangeDate}
+                disabled={isChangingDate || mode === "edit"}
+              />
               {(session?.tags || page.summary.tags).length > 0 && (
                 <>
                   <span>•</span>
