@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.1.0] - 2026-07-15
+### Added
+
+- GitHub OAuth authentication.
+- JWT session management.
+- Authorization middleware.
+- Protected diary API routes.
+- Authentication-aware header.
+- Avatar dropdown.
+- Session restoration after login.
+- Return-to-page support.
+- Centralized API client.
+- Global 401 handling.
+- Network-aware empty states.
+- Loading skeletons during session validation.
+
 ## [v0.10.0] - 2026-07-02
 ### Added
 - Standardized `favorite` and `archived` flags support on models (`DiaryPageSummary`, `EditorSession`).

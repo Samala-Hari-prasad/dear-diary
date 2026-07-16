@@ -7,6 +7,7 @@ export interface EditorSession {
   content: DocumentBlock[];
   isDirty: boolean;
   mode: "read" | "edit";
+  date?: string;
   createdAt: string;
   updatedAt: string;
   sha?: string;

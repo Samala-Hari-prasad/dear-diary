@@ -11,8 +11,12 @@ import { RepositoryStatus } from "@/components/status/repository-status";
 import { DiaryPageSummary } from "@/types/models/diary-summary";
 import { DiaryPage } from "@/types/models/diary-page";
 import { NEW_MEMORY_LABEL } from "@/constants/app";
+import { useAuthStatus } from "@/hooks/use-auth-status";
+import { LoginButton } from "@/components/auth/LoginButton";
+import { apiClient } from "@/lib/api/client";
 
 export default function Home() {
+  const { authenticated, loading: authLoading, networkError } = useAuthStatus();
   const [pages, setPages] = useState<DiaryPageSummary[]>([]);
   const [selectedSlug, setSelectedSlug] = useState<string | undefined>(undefined);
   const [selectedPage, setSelectedPage] = useState<DiaryPage | null>(null);
@@ -23,8 +27,7 @@ export default function Home() {
   const fetchIndex = async () => {
     setLoadingIndex(true);
     try {
-      const res = await fetch("/api/v1/diary/pages");
-      const result = await res.json();
+      const result = await apiClient<any>("/api/v1/diary/pages");
       if (result.success && Array.isArray(result.data)) {
         setPages(result.data);
       }
@@ -39,8 +42,7 @@ export default function Home() {
   const fetchPage = async (slug: string) => {
     setLoadingPage(true);
     try {
-      const res = await fetch(`/api/v1/diary/pages/${slug}`);
-      const result = await res.json();
+      const result = await apiClient<any>(`/api/v1/diary/pages/${slug}`);
       if (result.success && result.data) {
         setSelectedPage(result.data);
       }
@@ -87,14 +89,22 @@ export default function Home() {
     setSelectedPage(newPage);
   };
 
-  const handlePageUpdate = (updatedPage: DiaryPage) => {
+  const handlePageUpdate = (updatedPage: DiaryPage, oldSlug?: string) => {
     setSelectedPage(updatedPage);
+    
+    if (oldSlug && oldSlug !== updatedPage.summary.slug) {
+      setSelectedSlug(updatedPage.summary.slug);
+    }
+
     // Update summary in index list
     setPages(
       pages.map((p) => {
-        if (p.slug === updatedPage.summary.slug) {
+        const targetSlug = oldSlug || updatedPage.summary.slug;
+        if (p.slug === targetSlug) {
           return {
             ...p,
+            id: updatedPage.summary.id,
+            slug: updatedPage.summary.slug,
             title: updatedPage.summary.title,
             tags: updatedPage.summary.tags,
             updatedAt: updatedPage.summary.updatedAt,
@@ -108,8 +118,12 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchIndex();
-  }, []);
+    if (authenticated) {
+      fetchIndex();
+    } else if (!authLoading) {
+      setLoadingIndex(false);
+    }
+  }, [authenticated, authLoading]);
 
   const handleSelectPage = (slug: string) => {
     setSelectedSlug(slug);
@@ -128,7 +142,33 @@ export default function Home() {
     >
       <div className="flex flex-col gap-12 max-w-2xl mx-auto">
         {/* Main Content Area */}
-        {loadingIndex ? (
+        {authLoading ? (
+          <div className="w-full flex flex-col gap-6 animate-pulse text-left py-12">
+            <div className="w-1/3 h-6 bg-foreground/10 rounded-sm" />
+            <div className="w-full h-40 bg-foreground/5 rounded-sm border border-border" />
+          </div>
+        ) : networkError ? (
+          <div className="flex flex-col items-center gap-12 pt-24 pb-12">
+            <div className="flex flex-col gap-4 text-center">
+              <h2 className="font-heading text-3xl font-light tracking-wide leading-tight md:text-4xl text-destructive">
+                Unable to reach the server.
+              </h2>
+              <p className="text-muted-foreground">Please check your internet connection.</p>
+            </div>
+            <Button variant="ghost" onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </div>
+        ) : !authenticated ? (
+          <div className="flex flex-col items-center gap-12 pt-24 pb-12">
+            <div className="flex flex-col gap-4 text-center">
+              <h2 className="font-heading text-3xl font-light tracking-wide leading-tight md:text-4xl">
+                Sign in to view your diary.
+              </h2>
+            </div>
+            <LoginButton />
+          </div>
+        ) : loadingIndex ? (
           <div className="w-full flex flex-col gap-6 animate-pulse text-left py-12">
             <div className="w-1/3 h-6 bg-foreground/10 rounded-sm" />
             <div className="w-full h-40 bg-foreground/5 rounded-sm border border-border" />

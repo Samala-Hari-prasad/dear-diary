@@ -10,30 +10,44 @@ import { Button } from "@/components/ui/button";
 
 interface PageViewProps {
   page: DiaryPage;
-  onPageUpdate?: (updatedPage: DiaryPage) => void;
+  onPageUpdate?: (updatedPage: DiaryPage, oldSlug?: string) => void;
 }
 
 export function PageView({ page, onPageUpdate }: PageViewProps) {
   const [mode, setMode] = useState<"read" | "edit">("read");
   const [session, setSession] = useState<EditorSession | null>(null);
 
-  // Sync session state when page changes
+  // Sync session state when page changes (only on initial load or SHA/ID change)
   useEffect(() => {
-    setSession({
-      pageId: page.summary.id,
-      title: page.summary.title,
-      tags: page.summary.tags,
-      content: page.blocks,
-      isDirty: false,
-      mode: "read",
-      createdAt: page.summary.updatedAt,
-      updatedAt: page.summary.updatedAt,
-      sha: page.sha,
-      favorite: page.summary.favorite,
-      archived: page.summary.archived,
+    setSession((prev) => {
+      // If we are switching to a completely different page from the sidebar
+      const isDifferentPage = !prev || (prev.pageId !== page.summary.id && !prev.pageId?.startsWith("draft-"));
+
+      if (isDifferentPage) {
+        setMode("read");
+        return {
+          pageId: page.summary.id,
+          title: page.summary.title,
+          tags: page.summary.tags,
+          content: page.blocks,
+          isDirty: false,
+          mode: "read",
+          createdAt: page.summary.updatedAt,
+          updatedAt: page.summary.updatedAt,
+          sha: page.sha,
+          favorite: page.summary.favorite,
+          archived: page.summary.archived,
+        };
+      }
+      
+      // Otherwise, just invisibly update the SHA and pageId if they were updated by a background save
+      return {
+        ...prev,
+        sha: page.sha,
+        pageId: page.summary.id,
+      };
     });
-    setMode("read");
-  }, [page]);
+  }, [page.summary.id, page.sha]);
 
   const handleSessionChange = (updatedSession: EditorSession) => {
     setSession(updatedSession);
@@ -107,6 +121,7 @@ export function PageView({ page, onPageUpdate }: PageViewProps) {
           session={session}
           onChange={handleSessionChange}
           onSaveSuccess={(newSlug) => {
+            const oldSlug = page.summary.slug;
             // Confirm the new SHA and slug on successful write transaction
             if (onPageUpdate) {
               onPageUpdate({
@@ -122,7 +137,7 @@ export function PageView({ page, onPageUpdate }: PageViewProps) {
                 },
                 blocks: session.content,
                 sha: session.sha,
-              });
+              }, oldSlug);
             }
           }}
         />

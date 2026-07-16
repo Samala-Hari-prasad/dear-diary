@@ -12,6 +12,8 @@ export async function githubFetch(path: string, options: RequestInit = {}): Prom
     "User-Agent": "the-digital-diary",
     ...options.headers,
   };
+  console.log(`[githubFetch] URL: ${url}`);
+  console.log(`[githubFetch] Token prefix: ${config.githubToken.substring(0, 15)}... length: ${config.githubToken.length}`);
 
   return fetch(url, {
     ...options,

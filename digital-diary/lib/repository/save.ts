@@ -3,6 +3,7 @@ import { EditorSession } from "@/types/models/editor-document";
 import { DiaryPage } from "@/types/models/diary-page";
 import { writeGitHubFile } from "@/lib/github/write";
 import { updateIndexFiles } from "@/lib/github/index-writer";
+import { loadMetaIndex } from "@/lib/github/index";
 
 function generateSlug(title: string): string {
   const base = title
@@ -16,7 +17,23 @@ function generateSlug(title: string): string {
 export async function saveEditorSession(
   session: EditorSession
 ): Promise<{ sha: string; slug: string; updatedAt: string }> {
-  // Generate a clean slug for new drafts, otherwise preserve existing
+  // Validate date format if present
+  if (session.date) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(session.date)) {
+      throw new Error(`INVALID_DATE_FORMAT`);
+    }
+    
+    // Check for "One Memory Per Day" conflict
+    const currentIndex = await loadMetaIndex();
+    const existingConflict = currentIndex.find(
+      (p) => (p.date === session.date || (!p.date && p.updatedAt.startsWith(session.date!))) && p.id !== session.pageId
+    );
+    if (existingConflict) {
+      throw new Error(`DATE_CONFLICT`);
+    }
+  }
+
+  // Generate a clean slug for new drafts, otherwise preserve existing exactly. Slug never changes after creation.
   let slug = session.pageId || "";
   if (!slug || slug.startsWith("draft-") || slug.startsWith("new-memory-")) {
     slug = generateSlug(session.title);
@@ -32,6 +49,7 @@ export async function saveEditorSession(
       slug: slug,
       title: session.title || "Untitled Memory",
       cover: null, // Cover image management belongs to v0.7.0 Media Workspace
+      date: session.date,
       updatedAt,
       tags: session.tags,
       favorite: session.favorite,

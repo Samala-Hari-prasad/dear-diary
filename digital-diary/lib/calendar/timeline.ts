@@ -11,7 +11,7 @@ export function formatDateKey(dateStr: string | Date): string {
 
 export function filterToday(pages: DiaryPageSummary[]): DiaryPageSummary[] {
   const todayKey = formatDateKey(new Date());
-  return pages.filter((page) => formatDateKey(page.updatedAt) === todayKey);
+  return pages.filter((page) => formatDateKey(page.date || page.updatedAt) === todayKey);
 }
 
 export function filterThisWeek(pages: DiaryPageSummary[]): DiaryPageSummary[] {
@@ -28,7 +28,7 @@ export function filterThisWeek(pages: DiaryPageSummary[]): DiaryPageSummary[] {
   endOfWeek.setDate(endOfWeek.getDate() + 7);
 
   return pages.filter((page) => {
-    const pageDate = new Date(page.updatedAt);
+    const pageDate = new Date(page.date || page.updatedAt);
     return pageDate >= startOfWeek && pageDate < endOfWeek;
   });
 }
@@ -39,7 +39,7 @@ export function filterThisMonth(pages: DiaryPageSummary[]): DiaryPageSummary[] {
   const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
   return pages.filter((page) => {
-    const pageDate = new Date(page.updatedAt);
+    const pageDate = new Date(page.date || page.updatedAt);
     return pageDate >= startOfMonth && pageDate < nextMonth;
   });
 }
@@ -49,7 +49,7 @@ export function groupPageSummariesByDay(
 ): Record<string, DiaryPageSummary[]> {
   const groups: Record<string, DiaryPageSummary[]> = {};
   for (const page of pages) {
-    const key = formatDateKey(page.updatedAt);
+    const key = formatDateKey(page.date || page.updatedAt);
     if (!key) continue;
     if (!groups[key]) {
       groups[key] = [];

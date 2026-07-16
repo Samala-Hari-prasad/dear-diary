@@ -4,13 +4,17 @@ A private, Korean-minimalist digital diary. The application is designed to feel 
 
 ## Current Version
 
-v1.0.0
+v1.1.0
+
+## Release Status
+
+Stable
 
 ## Completed
 
 - Visual Shell
-- Repository Connection
-- Repository Reader (Read-Only)
+- GitHub Repository Integration
+- Repository Reader
 - Memory Editor (Local Drafts)
 - Repository Writer (Write API and Indexes)
 - Synchronization Engine (Debounce, Sync Queue, Conflicts)
@@ -19,10 +23,15 @@ v1.0.0
 - Calendar Timeline (Daily and Monthly Navigation)
 - Collections and Organization (Archive, Tags, and Favorites)
 - Production Hardening (Accessibility, Stability, QA)
+- Authentication and Security (GitHub OAuth and Cookie Sessions)
+- Authorization and Route Protection (Middleware)
+- UX Polish & Session Experience (Network Failures, Loading States, Redirects)
 
 ## Next
 
-- Authentication and Security (GitHub OAuth and Cookie Sessions)
+- Editor enhancements and writing experience improvements.
+- Additional export formats.
+- Continued stability and performance improvements.
 
 ## Stack
 
@@ -31,11 +40,14 @@ v1.0.0
 - Tailwind CSS
 - next-themes
 - lucide-react
+- jose (JWT sessions)
+- GitHub OAuth
 
 ## Getting Started
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
@@ -49,10 +61,25 @@ dear-diary/
 ├── components/           Layout views, sidebar, search, and calendar panels
 ├── constants/            Design tokens and app-level constants
 ├── docs/                 Changelogs, API specs, and storage formats
-├── lib/                  Services, API clients, and query tokenizers
+├── lib/                  
+│   ├── auth/             Authentication and session logic
+│   ├── github/           GitHub client and repo operations
+│   ├── api/              Centralized API wrappers
+│   └── config/           Environment definitions
 ├── public/               Static assets
 └── README.md
 ```
+
+## Architecture
+
+The application uses a single-repository architecture.
+
+- Next.js App Router
+- GitHub Contents API for storage
+- GitHub OAuth for identity
+- JWT cookie sessions
+- Middleware-based authorization
+- Client-side synchronization and offline drafts
 
 ## Documentation
 
