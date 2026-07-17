@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
+import { Toaster } from "@/components/ui/toast";
 
 interface AppShellProps {
   children: ReactNode;
@@ -17,6 +18,7 @@ export function AppShell({ children, sidebar }: AppShellProps) {
           {children}
         </main>
       </div>
+      <Toaster />
     </div>
   );
 }
