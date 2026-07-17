@@ -134,37 +134,7 @@ export function RepositoryStatus() {
             </p>
           )}
 
-          {/* Repository Metadata */}
-          <div className="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-border pt-4 text-sm leading-relaxed">
-            <div>
-              <span className="block text-xs text-foreground/50 tracking-wide uppercase">Owner</span>
-              <span className="font-medium text-foreground">
-                {status.repository?.owner || "—"}
-              </span>
-            </div>
-            <div>
-              <span className="block text-xs text-foreground/50 tracking-wide uppercase">Repository</span>
-              <span className="font-medium text-foreground">
-                {status.repository?.name || "—"}
-              </span>
-            </div>
-            <div>
-              <span className="block text-xs text-foreground/50 tracking-wide uppercase">Branch</span>
-              <span className="font-medium text-foreground">
-                {status.repository?.branch || "—"}
-              </span>
-            </div>
-            <div>
-              <span className="block text-xs text-foreground/50 tracking-wide uppercase">Manifest</span>
-              <span className="font-medium text-foreground">
-                {status.manifest?.found && !activeError ? (
-                  <span className="text-accent">Loaded (v{status.manifest.appVersion})</span>
-                ) : (
-                  <span className="text-foreground/50">Missing or invalid</span>
-                )}
-              </span>
-            </div>
-          </div>
+
         </div>
       ) : null}
     </Card>
