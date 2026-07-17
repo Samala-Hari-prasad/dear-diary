@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
+import { memoryEvents } from "@/lib/client/events";
 import { AppShell } from "@/components/layout/app-shell";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
@@ -126,6 +127,63 @@ export default function Home() {
       setLoadingIndex(false);
     }
   }, [authenticated, authLoading]);
+
+  // Global event listeners for optimistic UI
+  useEffect(() => {
+    const unsubCreate = memoryEvents.on("memory:created", ({ summary }) => {
+      setPages((prev) => [summary, ...prev.filter((p) => p.slug !== summary.slug)]);
+    });
+
+    const unsubUpdate = memoryEvents.on("memory:updated", ({ summary }) => {
+      setPages((prev) => prev.map((p) => (p.slug === summary.slug ? summary : p)));
+      setSelectedPage((prev) => (prev?.summary.slug === summary.slug ? { ...prev, summary } : prev));
+    });
+
+    const unsubDelete = memoryEvents.on("memory:deleted", ({ slug }) => {
+      setPages((prev) => prev.filter((p) => p.slug !== slug));
+      setSelectedSlug((prevSlug) => {
+        if (prevSlug === slug) {
+          setSelectedPage(null);
+          return undefined;
+        }
+        return prevSlug;
+      });
+    });
+
+    const unsubRestore = memoryEvents.on("memory:restored", ({ summary }) => {
+      setPages((prev) => [summary, ...prev.filter((p) => p.slug !== summary.slug)]);
+    });
+
+    const unsubDuplicate = memoryEvents.on("memory:duplicated", ({ summary }) => {
+      setPages((prev) => [summary, ...prev]);
+    });
+
+    const unsubDateChanged = memoryEvents.on("memory:dateChanged", ({ slug, newDate }) => {
+      setPages((prev) =>
+        prev.map((p) => (p.slug === slug ? { ...p, date: newDate, updatedAt: new Date().toISOString() } : p))
+      );
+      setSelectedPage((prev) => 
+        prev?.summary.slug === slug 
+          ? { ...prev, summary: { ...prev.summary, date: newDate, updatedAt: new Date().toISOString() } } 
+          : prev
+      );
+    });
+
+    const unsubOpened = memoryEvents.on("memory:opened", ({ slug }) => {
+      setSelectedSlug(slug);
+      fetchPage(slug);
+    });
+
+    return () => {
+      unsubCreate();
+      unsubUpdate();
+      unsubDelete();
+      unsubRestore();
+      unsubDuplicate();
+      unsubDateChanged();
+      unsubOpened();
+    };
+  }, []);
 
   const handleSelectPage = (slug: string) => {
     setSelectedSlug(slug);
