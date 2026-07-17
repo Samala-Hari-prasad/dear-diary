@@ -1,7 +1,7 @@
 import "server-only";
 import { EditorSession } from "@/types/models/editor-document";
 import { saveEditorSession } from "./save";
-import { deleteGitHubFile } from "@/lib/github/write";
+import { deleteGitHubFile, writeGitHubFile } from "@/lib/github/write";
 import { deleteFromIndexFiles } from "@/lib/github/index-writer";
 import { loadMetaIndex } from "@/lib/github/index";
 import { getEnvConfig } from "@/lib/config/env";
@@ -45,11 +45,26 @@ export async function deleteMemoryTransaction(slug: string): Promise<void> {
 
   const data = await res.json();
   const sha = data.sha;
+  const content = data.content;
 
-  // Delete the page file
+  // 1. Write to trash
+  try {
+    await writeGitHubFile({
+      path: `content/trash/${slug}.json`,
+      content,
+      message: `feat: move memory "${existing.title}" to trash`,
+      contentEncoding: "base64"
+    });
+  } catch (err: any) {
+    if (!err.message.includes("CONFLICT")) {
+      throw err; // Ignore if already in trash
+    }
+  }
+
+  // 2. Delete the page file
   await deleteGitHubFile(path, `feat: delete memory "${existing.title}"`, sha);
 
-  // Update the meta-index
+  // 3. Update the meta-index
   await deleteFromIndexFiles(slug);
 }
 
