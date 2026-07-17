@@ -106,3 +106,85 @@ export async function changeDateTransaction(slug: string, newDate: string): Prom
 
   await saveMemoryTransaction(session);
 }
+
+/**
+ * 4. Restore Transaction
+ * Retrieves a memory from trash and moves it back to pages.
+ */
+export async function restoreMemoryTransaction(slug: string): Promise<void> {
+  const { githubOwner: owner, githubRepo: repo, githubBranch: branch } = getEnvConfig();
+  const trashPath = `content/trash/${slug}.json`;
+  const pagesPath = `content/pages/${slug}.json`;
+
+  // 1. Fetch from trash
+  const res = await githubFetch(`/repos/${owner}/${repo}/contents/${trashPath}?ref=${branch}`);
+  if (res.status === 404) {
+    throw new Error("NOT_IN_TRASH");
+  }
+  if (!res.ok) {
+    throw new Error(`TRASH_FETCH_FAILED: ${res.status}`);
+  }
+
+  const data = await res.json();
+  const sha = data.sha;
+  const contentBase64 = data.content;
+  const contentString = Buffer.from(contentBase64, "base64").toString("utf-8");
+  const pageData = JSON.parse(contentString);
+
+  // 2. Write to pages
+  await writeGitHubFile({
+    path: pagesPath,
+    content: contentBase64,
+    message: `feat: restore memory "${pageData.summary.title}"`,
+    contentEncoding: "base64"
+  });
+
+  // 3. Delete from trash
+  await deleteGitHubFile(trashPath, `feat: remove restored memory from trash`, sha);
+
+  // 4. Add back to index
+  const { updateIndexFiles } = await import("@/lib/github/index-writer");
+  await updateIndexFiles(pageData.summary);
+}
+
+/**
+ * 5. Duplicate Transaction
+ * Duplicates a memory completely to a new date.
+ */
+export async function duplicateMemoryTransaction(slug: string, newDate: string): Promise<{ newSlug: string }> {
+  // 1. Check date format and conflict
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+    throw new Error(`INVALID_DATE_FORMAT`);
+  }
+  const index = await loadMetaIndex();
+  const existingConflict = index.find((p) => p.date === newDate);
+  if (existingConflict) {
+    throw new Error(`DATE_CONFLICT`);
+  }
+
+  // 2. Load original memory
+  const originalPage = await loadPage(slug);
+
+  // 3. Prepare new memory
+  const newSlug = newDate; // Simplest slug format for this diary
+  const now = new Date().toISOString();
+  const newSession: EditorSession = {
+    pageId: `mem-${Date.now()}`,
+    title: originalPage.summary.title,
+    content: originalPage.blocks,
+    date: newDate,
+    tags: originalPage.summary.tags,
+    favorite: originalPage.summary.favorite || false,
+    archived: originalPage.summary.archived || false,
+    createdAt: newDate,
+    updatedAt: now,
+    sha: "", // New file
+    isDirty: false,
+    mode: "read"
+  };
+
+  // 4. Save via normal transaction
+  await saveMemoryTransaction(newSession);
+
+  return { newSlug };
+}

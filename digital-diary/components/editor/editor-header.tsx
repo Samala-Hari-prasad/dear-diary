@@ -1,5 +1,5 @@
-import { ChangeEvent } from "react";
-import { Heart, Archive, Trash2 } from "lucide-react";
+import { ChangeEvent, useState, useRef, useEffect } from "react";
+import { Heart, Archive, Trash2, Edit2 } from "lucide-react";
 
 interface EditorHeaderProps {
   title: string;
@@ -28,6 +28,20 @@ export function EditorHeader({
   onDelete,
   mode,
 }: EditorHeaderProps) {
+  const [isEditingTitle, setIsEditingTitle] = useState(mode === "edit");
+  const titleInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync mode changes to local editing state
+  useEffect(() => {
+    setIsEditingTitle(mode === "edit");
+  }, [mode]);
+
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current && mode === "read") {
+      titleInputRef.current.focus();
+    }
+  }, [isEditingTitle, mode]);
+
   const formattedDate = new Date(createdAt).toLocaleDateString(undefined, {
     weekday: "long",
     year: "numeric",
@@ -45,20 +59,26 @@ export function EditorHeader({
 
   return (
     <div className="flex flex-col gap-3 border-b border-border/80 pb-6 mb-6 text-left">
-      <div className="flex items-center justify-between gap-4">
-        {mode === "edit" ? (
+      <div className="flex items-center justify-between gap-4 group">
+        {isEditingTitle ? (
           <input
+            ref={titleInputRef}
             type="text"
             value={title}
             onChange={(e) => onTitleChange(e.target.value)}
+            onBlur={() => mode === "read" && setIsEditingTitle(false)}
+            onKeyDown={(e) => e.key === "Enter" && mode === "read" && setIsEditingTitle(false)}
             className="flex-1 bg-transparent border-none outline-none font-heading text-3xl font-light text-foreground placeholder:text-foreground/25 tracking-wide focus:ring-0 p-0 focus:outline-none"
             placeholder="Untitled Memory"
             aria-label="Memory Title"
           />
         ) : (
-          <h2 className="font-heading text-3xl font-light tracking-wide text-foreground leading-tight md:text-4xl">
-            {title || "Untitled Memory"}
-          </h2>
+          <div className="flex items-center gap-3 flex-1 cursor-text" onClick={() => setIsEditingTitle(true)}>
+            <h2 className="font-heading text-3xl font-light tracking-wide text-foreground leading-tight md:text-4xl">
+              {title || "Untitled Memory"}
+            </h2>
+            <Edit2 className="w-4 h-4 opacity-0 group-hover:opacity-50 transition-opacity" />
+          </div>
         )}
 
         {/* Favorite & Archive Toggle Controls */}

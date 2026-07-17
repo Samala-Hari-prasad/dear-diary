@@ -45,6 +45,22 @@ export class MemoryService {
   async changeDate(slug: string, newDate: string): Promise<void> {
     return await changeDateTransaction(slug, newDate);
   }
+
+  /**
+   * Restores a memory from the trash.
+   */
+  async restoreMemory(slug: string): Promise<void> {
+    const { restoreMemoryTransaction } = await import("./transaction");
+    return await restoreMemoryTransaction(slug);
+  }
+
+  /**
+   * Duplicates a memory to a new date.
+   */
+  async duplicateMemory(slug: string, newDate: string): Promise<{ newSlug: string }> {
+    const { duplicateMemoryTransaction } = await import("./transaction");
+    return await duplicateMemoryTransaction(slug, newDate);
+  }
 }
 
 export const memoryService = new MemoryService();

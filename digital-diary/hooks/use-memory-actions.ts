@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { memoryEvents } from "@/lib/client/events";
-import { openOrCreateMemory, deleteMemoryApi, changeDateApi } from "@/lib/client/memory-client";
+import { openOrCreateMemory, deleteMemoryApi, changeDateApi, restoreMemoryApi, duplicateMemoryApi } from "@/lib/client/memory-client";
 import { DiaryPageSummary } from "@/types/models/diary-summary";
+import { toast, dismissToast } from "@/hooks/use-toast";
 
 export function useMemoryActions() {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,38 +25,56 @@ export function useMemoryActions() {
   };
 
   const rename = async (summary: DiaryPageSummary, newTitle: string) => {
-    // Emits an optimistic update. The actual save is handled by the editor's debounced sync queue
-    // because the prompt says "Use existing save pipeline."
     const updated = { ...summary, title: newTitle, updatedAt: new Date().toISOString() };
     memoryEvents.emit("memory:updated", { summary: updated });
   };
 
   const deleteAction = async (summary: DiaryPageSummary) => {
-    // 1. Optimistically delete from UI
     memoryEvents.emit("memory:deleted", { slug: summary.slug });
     
+    const toastId = toast({
+      message: "Memory deleted.",
+      action: {
+        label: "Undo",
+        onClick: () => restore(summary)
+      },
+      duration: 5000,
+    });
+
     try {
-      // 2. Actually delete (moves to trash on backend, implemented in Slice 3)
       await deleteMemoryApi(summary.slug);
-      
-      // 3. TODO: Show Toast with Undo button (Slice 3)
-      // If Undo clicked -> call restore()
     } catch (err) {
-      // 4. Rollback on failure
       memoryEvents.emit("memory:restored", { summary });
+      dismissToast(toastId);
       throw err;
     }
   };
 
   const restore = async (summary: DiaryPageSummary) => {
-    // Optimistic restore
     memoryEvents.emit("memory:restored", { summary });
-    // TODO: Call restore API (Slice 3)
+    try {
+      await restoreMemoryApi(summary.slug);
+    } catch (err) {
+      memoryEvents.emit("memory:deleted", { slug: summary.slug });
+      throw err;
+    }
   };
 
   const duplicate = async (summary: DiaryPageSummary, newDate: string) => {
-    // TODO: Call duplicate API and emit events (Slice 3)
-    console.log("Duplicate not yet implemented", summary, newDate);
+    const duplicatedSummary = { ...summary, slug: newDate, date: newDate, id: `mem-${Date.now()}` };
+    memoryEvents.emit("memory:duplicated", { summary: duplicatedSummary });
+    memoryEvents.emit("memory:opened", { slug: newDate });
+
+    try {
+      const result = await duplicateMemoryApi(summary.slug, newDate);
+      if (result.newSlug !== newDate) {
+        // Handle case where API slug differs from requested date (e.g., date conflicts handled differently later)
+      }
+    } catch (err) {
+      memoryEvents.emit("memory:deleted", { slug: newDate });
+      memoryEvents.emit("memory:opened", { slug: summary.slug }); // revert open
+      throw err;
+    }
   };
 
   const changeDate = async (summary: DiaryPageSummary, newDate: string) => {
