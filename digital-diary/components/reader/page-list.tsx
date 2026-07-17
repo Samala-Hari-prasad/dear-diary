@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { DiaryPageSummary } from "@/types/models/diary-summary";
 import { ContextMenu, useContextMenuList } from "@/components/ui/context-menu";
