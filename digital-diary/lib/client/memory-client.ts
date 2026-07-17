@@ -57,3 +57,41 @@ export async function changeDateApi(slug: string, date: string): Promise<void> {
     throw new Error(data.error?.message || "Failed to change date");
   }
 }
+
+export async function restoreMemoryApi(slug: string): Promise<void> {
+  const res = await fetch(`/api/v1/diary/pages/${slug}/restore`, {
+    method: "POST",
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.json().catch(() => ({}));
+    throw new Error(errorBody?.error?.message || "Failed to restore memory");
+  }
+
+  const data = await res.json();
+  if (!data.success) {
+    throw new Error(data.error?.message || "Failed to restore memory");
+  }
+}
+
+export async function duplicateMemoryApi(slug: string, date: string): Promise<{ newSlug: string }> {
+  const res = await fetch(`/api/v1/diary/pages/${slug}/duplicate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ date }),
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.json().catch(() => ({}));
+    throw new Error(errorBody?.error?.message || "Failed to duplicate memory");
+  }
+
+  const data = await res.json();
+  if (!data.success) {
+    throw new Error(data.error?.message || "Failed to duplicate memory");
+  }
+
+  return data.data;
+}
