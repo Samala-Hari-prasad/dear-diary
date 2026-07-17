@@ -2,9 +2,11 @@
 
 A private, Korean-minimalist digital diary. The application is designed to feel like opening a beautiful paper notebook: calm, elegant, and timeless. It is not a productivity app, not a dashboard, and not a note-taking SaaS product.
 
+> **Every new feature must remove more friction than it introduces complexity.**
+
 ## Current Version
 
-v1.1.0
+v1.2.1
 
 ## Release Status
 
