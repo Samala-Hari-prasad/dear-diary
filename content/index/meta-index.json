@@ -1,15 +1,3 @@
 {
-  "pages": [
-    {
-      "id": "graduation-day",
-      "slug": "graduation-day",
-      "title": "Graduation Day",
-      "cover": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1200&auto=format&fit=crop",
-      "updatedAt": "2026-07-01T12:00:00.000Z",
-      "tags": [
-        "personal",
-        "milestone"
-      ]
-    }
-  ]
+  "pages": []
 }
