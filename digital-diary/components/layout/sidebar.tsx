@@ -216,13 +216,17 @@ export function Sidebar({ pages = [], selectedSlug, onSelect = () => {} }: Sideb
             <div className="flex flex-col gap-3">
               <span className="flex items-center gap-3 rounded-sm px-3 py-2 text-sm text-foreground/60 font-medium select-none">
                 <BookOpen size={16} strokeWidth={1.5} aria-hidden="true" />
-                Memories
+                {searchQuery.trim() === "" ? "Recent Memories" : "Search Results"}
               </span>
               <div className="pl-1">
                 {filteredPages.length === 0 ? (
                   <EmptySearch />
                 ) : (
-                  <PageList pages={filteredPages} selectedSlug={selectedSlug} onSelect={onSelect} />
+                  <PageList 
+                    pages={searchQuery.trim() === "" ? filteredPages.slice(0, 5) : filteredPages} 
+                    selectedSlug={selectedSlug} 
+                    onSelect={onSelect} 
+                  />
                 )}
               </div>
             </div>

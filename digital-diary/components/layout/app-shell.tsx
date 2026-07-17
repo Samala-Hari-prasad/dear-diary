@@ -1,7 +1,10 @@
+"use client";
+
 import { ReactNode } from "react";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Toaster } from "@/components/ui/toast";
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 
 interface AppShellProps {
   children: ReactNode;
@@ -9,6 +12,8 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, sidebar }: AppShellProps) {
+  useKeyboardShortcuts();
+  
   return (
     <div className="flex min-h-screen flex-col">
       <Header />

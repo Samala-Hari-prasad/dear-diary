@@ -2,6 +2,15 @@ import { compressImage, getBlobDimensions } from "./compressor";
 import { MediaAsset } from "@/types/models/media-asset";
 
 export async function uploadMedia(file: File): Promise<MediaAsset> {
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+  if (file.size > MAX_SIZE) {
+    throw new Error("File too large (max 10MB)");
+  }
+
+  const validTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  if (!validTypes.includes(file.type)) {
+    throw new Error("Unsupported file type. Please upload JPG, PNG, WEBP, or GIF.");
+  }
   const webpBlob = await compressImage(file);
   const { width, height } = await getBlobDimensions(webpBlob);
 

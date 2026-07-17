@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { memoryEvents } from "@/lib/client/events";
 import { openOrCreateMemory, deleteMemoryApi, changeDateApi, restoreMemoryApi, duplicateMemoryApi } from "@/lib/client/memory-client";
