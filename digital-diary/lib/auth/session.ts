@@ -1,51 +1,36 @@
-import { SignJWT, jwtVerify } from 'jose';
-import { SessionPayload } from './types';
-import { NextResponse } from 'next/server';
-import { getAuthConfig } from '../config/auth';
-import { ConfigurationError } from './errors';
-import { SESSION_COOKIE_NAME } from './constants';
+import { cookies } from "next/headers";
+import { encrypt, decrypt } from "./jwt";
+import { JWTPayload } from "jose";
 
-function getSecretKey() {
-  const { sessionSecret } = getAuthConfig();
-  if (!sessionSecret) {
-    throw new ConfigurationError('SESSION_SECRET is not configured');
-  }
-  return new TextEncoder().encode(sessionSecret);
-}
-
-export async function createSessionToken(payload: Omit<SessionPayload, 'iat' | 'exp'>): Promise<string> {
-  return new SignJWT(payload as any)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('7d')
-    .sign(getSecretKey());
-}
-
-export async function verifySessionToken(token: string): Promise<SessionPayload> {
-  const { payload } = await jwtVerify(token, getSecretKey());
-  return payload as unknown as SessionPayload;
-}
-
-export function setSessionCookie(response: NextResponse, token: string): void {
-  response.cookies.set({
-    name: SESSION_COOKIE_NAME,
-    value: token,
+export async function createSession(userId: string) {
+  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const session = await encrypt({ userId, expires });
+  
+  (await cookies()).set("session", session, {
+    expires,
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 7 * 24 * 60 * 60, // 7 days
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
   });
 }
 
-export function clearSessionCookie(response: NextResponse): void {
-  response.cookies.set({
-    name: SESSION_COOKIE_NAME,
-    value: '',
+export async function getSession(): Promise<JWTPayload | null> {
+  const session = (await cookies()).get("session")?.value;
+  if (!session) return null;
+  try {
+    return await decrypt(session);
+  } catch {
+    return null;
+  }
+}
+
+export async function destroySession() {
+  (await cookies()).set("session", "", {
+    expires: new Date(0),
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 0,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
   });
 }

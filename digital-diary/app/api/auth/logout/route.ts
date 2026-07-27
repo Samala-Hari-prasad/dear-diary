@@ -1,10 +1,7 @@
-import { NextResponse } from 'next/server';
-import { clearSessionCookie } from '../../../../lib/auth/session';
-import { clearStateCookie } from '../../../../lib/auth/state';
+import { NextRequest, NextResponse } from "next/server";
+import { destroySession } from "@/lib/auth/session";
 
-export async function POST() {
-  const response = NextResponse.json({ loggedOut: true });
-  clearSessionCookie(response);
-  clearStateCookie(response);
-  return response;
+export async function POST(request: NextRequest) {
+  await destroySession();
+  return NextResponse.redirect(new URL("/login", request.url));
 }

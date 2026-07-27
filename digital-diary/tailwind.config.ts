@@ -1,32 +1,19 @@
 import type { Config } from "tailwindcss";
 
-const config: Config = {
-  darkMode: "class",
+export default {
+  darkMode: ["class"],
   content: [
-    "./app/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        accent: "var(--accent)",
-        border: "var(--border)",
-      },
-      fontFamily: {
-        heading: ["var(--font-heading)"],
-        body: ["var(--font-body)"],
-      },
-      transitionDuration: {
-        DEFAULT: "200ms",
-      },
-      transitionTimingFunction: {
-        DEFAULT: "ease-out",
       },
     },
   },
   plugins: [],
-};
-
-export default config;
+} satisfies Config;
