@@ -1,8 +1,9 @@
 # The Digital Diary
 
-> **"Your journal. Your repository. Your Markdown. Nothing hidden."**
+> **Your journal. Your repository. Your Markdown. Nothing hidden.**
+> **When the software disappears, the memories remain.**
 
-A private, minimalist digital diary. The application is designed to feel like opening a beautiful paper notebook: calm, elegant, and timeless. 
+The Digital Diary is a web-based, keyboard-first journal that treats a GitHub repository as the single source of truth. No databases. No proprietary formats. Just pure Markdown files synced instantly to your own remote repository. 
 
 ## Vision
 
