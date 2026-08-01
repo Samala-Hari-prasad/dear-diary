@@ -8,12 +8,41 @@ export interface MemoryIndexItem {
   updatedAt: string;
 }
 
+import { githubFetch } from "./client";
+
 export async function getIndex(): Promise<{ items: MemoryIndexItem[]; sha?: string }> {
   const file = await getFile("content/index.json");
   if (!file) {
     return { items: [] };
   }
   return { items: JSON.parse(file.content), sha: file.sha };
+}
+
+export async function getDiscoveryItems(): Promise<any[]> {
+  const { items } = await getIndex();
+  
+  let sizeMap = new Map<string, number>();
+  try {
+    const pages = await githubFetch<any[]>("contents/content/pages");
+    if (Array.isArray(pages)) {
+      pages.forEach(page => {
+        const slug = page.name.replace(".md", "");
+        sizeMap.set(slug, page.size);
+      });
+    }
+  } catch (e) {
+    console.warn("Failed to fetch pages directory for sizes", e);
+  }
+
+  return items.map(item => {
+    const size = sizeMap.get(item.slug) || 0;
+    // 1 byte ≈ 1 char. ~5 chars per word, ~200 words per minute => ~1000 bytes per minute
+    const readingTimeMin = Math.max(1, Math.ceil(size / 1000));
+    return {
+      ...item,
+      readingTimeMin
+    };
+  });
 }
 
 export async function saveIndex(items: MemoryIndexItem[], sha?: string): Promise<string> {

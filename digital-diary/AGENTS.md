@@ -1,35 +1,35 @@
 # AGENTS.md
 
-Guidance for any AI agent (or human) continuing development on The Digital
-Diary beyond v0.1.0.
+Guidance for any AI agent (or human) continuing development on The Digital Diary beyond v1.0.0.
 
-## What This Project Is
+## Project Principles & Vision
 
-A private, minimalist digital diary. The defining feeling is calm — like
-opening a paper notebook. Every decision, visual or technical, should be
-checked against that feeling before being merged.
+**Vision**: A private, GitHub-backed Markdown notebook designed to feel like a paper journal while remaining transparent, portable, and durable.
 
-## What Exists Today (v0.1.0)
+1. **GitHub is the only database.**
+2. **Markdown is the canonical storage format.**
+3. **Features must not compromise portability.**
+4. **Prefer simplicity over abstraction.**
+5. **User data is always transparent and recoverable.**
+6. **The writing experience comes before everything else.**
+7. **Every new feature must strengthen one of four pillars: Writing, Organization, Discovery, or Maintenance.**
 
-- A static visual shell: header, sidebar, homepage, empty state.
+(See `docs/ROADMAP.md` for the full product blueprint and phasing.)
+
+## What Exists Today (v1.0.0)
+
+- A functional GitHub-backed Markdown storage architecture.
+- JWT-based authentication and secure cookies.
+- Creating, Editing, Autosaving, Searching, and Deleting (Trash) features.
 - A light/dark theme system driven by CSS custom properties and `next-themes`.
-- A small set of reusable UI primitives: `Button`, `Card`, `ThemeToggle`.
-- No data layer of any kind. The "New Memory" button and sidebar items are
-  not yet wired to any behavior.
 
 ## What Does NOT Exist Yet
 
 Do not assume any of the following exist unless you have added them yourself:
 
-- Authentication
-- Persistent storage or a database
-- A rich text or markdown editor
-- API routes
-- Global state management
-- Autosave
-- Image upload
-- Search
-- Calendar or collections views
+- A full database (Prisma, Postgres, etc.)
+- Collections or tags metadata storage
+- A Calendar or Timeline view
 
 ## Directory Conventions
 

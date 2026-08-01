@@ -50,7 +50,8 @@ export async function GET(request: NextRequest) {
     });
 
     if (!tokenResponse.ok) {
-      return clearState(NextResponse.json({ error: "Failed to fetch access token from GitHub" }, { status: 400 }));
+      const errorText = await tokenResponse.text();
+      return clearState(NextResponse.json({ error: `Failed to fetch access token from GitHub. Status: ${tokenResponse.status}. Details: ${errorText}` }, { status: 400 }));
     }
 
     const tokenData = await tokenResponse.json();
