@@ -54,7 +54,7 @@ export function Editor({
     }
   };
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = useCallback(async (file: File) => {
     setUploading(true);
     try {
       const compressed = await compressImage(file);
@@ -77,7 +77,7 @@ export function Editor({
     } finally {
       setUploading(false);
     }
-  };
+  }, [content, uploadImage, setContent]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -90,7 +90,7 @@ export function Editor({
     if (file && file.type.startsWith("image/")) {
       handleFileUpload(file);
     }
-  }, []);
+  }, [handleFileUpload]);
 
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     const file = e.clipboardData.files?.[0];
@@ -98,7 +98,7 @@ export function Editor({
       e.preventDefault();
       handleFileUpload(file);
     }
-  }, []);
+  }, [handleFileUpload]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "s") {

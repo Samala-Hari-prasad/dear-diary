@@ -8,12 +8,16 @@ export default async function AppHome(props: { searchParams: Promise<{ [key: str
   const searchParams = await props.searchParams;
   const tab = typeof searchParams.tab === 'string' ? searchParams.tab : 'timeline';
   
-  let items = [];
+  let items: Awaited<ReturnType<typeof getDiscoveryItems>> = [];
   let error = null;
   try {
     items = await getDiscoveryItems();
-  } catch (e: any) {
-    error = e.message || "Failed to load memory index.";
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      error = e.message || "Failed to load memory index.";
+    } else {
+      error = "Failed to load memory index.";
+    }
   }
 
   return (
@@ -48,12 +52,12 @@ export default async function AppHome(props: { searchParams: Promise<{ [key: str
             <p className="text-muted-foreground max-w-sm mb-6">
               {error.includes("429") ? "Rate limit exceeded. Please wait a moment before refreshing." : "We couldn't reach GitHub to load your memories. Check your internet connection or try again."}
             </p>
-            <a 
+            <Link 
               href="/" 
               className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium text-sm hover:bg-primary/90 transition-colors inline-block"
             >
               Retry
-            </a>
+            </Link>
           </div>
         ) : (
           <>

@@ -28,10 +28,10 @@
     background: transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-muted-foreground/20 rounded-full;
+    @apply bg-muted-foreground opacity-20 rounded-full;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/40;
+    @apply bg-muted-foreground opacity-40;
   }
   
   /* Make all scrollbars on the page look clean */
@@ -46,6 +46,6 @@
     @apply bg-border rounded-full border-[2px] border-solid border-background;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/50;
+    @apply bg-muted-foreground opacity-50;
   }
 }

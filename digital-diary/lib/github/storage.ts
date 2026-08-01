@@ -18,12 +18,12 @@ export async function getIndex(): Promise<{ items: MemoryIndexItem[]; sha?: stri
   return { items: JSON.parse(file.content), sha: file.sha };
 }
 
-export async function getDiscoveryItems(): Promise<any[]> {
+export async function getDiscoveryItems(): Promise<(MemoryIndexItem & { readingTimeMin: number })[]> {
   const { items } = await getIndex();
   
-  let sizeMap = new Map<string, number>();
+  const sizeMap = new Map<string, number>();
   try {
-    const pages = await githubFetch<any[]>("contents/content/pages");
+    const pages = await githubFetch<{ name: string; size: number }[]>("contents/content/pages");
     if (Array.isArray(pages)) {
       pages.forEach(page => {
         const slug = page.name.replace(".md", "");

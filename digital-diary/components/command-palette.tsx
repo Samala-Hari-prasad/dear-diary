@@ -14,7 +14,6 @@ import {
   Settings,
   CalendarDays
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
