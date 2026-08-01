@@ -1,33 +1,64 @@
 # The Digital Diary Roadmap
 
-This roadmap does not describe what *will* be built. It describes what has *earned* its place, what is currently being considered, and what has been explicitly rejected.
+> **Capture memories. Find them later. Enjoy revisiting them.**
 
-Features are not added because they seem cool. They are added because 30 days of actual usage demanded them.
+This roadmap defines the boundary of what The Digital Diary is and what it will never be. New features are added only if they support the core promise and have earned their place through real-world friction.
 
-## Earned
-*Features that proved their worth through daily friction and usage.*
+---
 
-- **Cmd+S (Autosave)**: Removed the anxiety of losing data.
-- **Timeline**: Navigating by time proved more natural than searching by title.
-- **Calendar**: Visualizing streaks and gaps encouraged consistency.
-- **Markdown Preview**: Clean reading experience without proprietary formats.
-- **Command Palette (Cmd+K)**: Frictionless navigation without mouse dependency.
-- **GitHub Backing**: Complete ownership and portability of data.
+## Must Have (v1.0)
+*These complete the diary without changing its philosophy.*
 
-## Candidate
-*Features we are keeping an eye on, but won't build until usage demands it.*
+- **Rich Editor**: Markdown, images, checklists, quotes. (Critical)
+- **Auto Save**: Save every few seconds, draft recovery. (Critical)
+- **Full Search**: Text, title, date, tags. (Critical)
+- **Calendar Heatmap**: Indicates days with entries. 
+- **Timeline**: Navigates like reading your life.
+- **Image Gallery**: Browsable uploaded images.
+- **Tags**: Simple, non-nested tags (e.g., family, travel).
+- **Collections**: Broad categories (e.g., Journal, Projects).
+- **Keyboard Shortcuts**: N, Ctrl+K, Ctrl+S, Esc.
+- **Responsive Design**: Desktop, tablet, phone.
 
-- **Today in History**: Resurfacing memories from exactly a year ago.
-- **Search (Full-text)**: Needed if the Timeline becomes too dense.
-- **Backlinks**: Might be useful for connecting related memories.
-- **Favorites**: Pinning specific memories to the top.
+---
+
+## Nice to Have (v1.x)
+*These improve daily use but aren't required for launch.*
+
+- **Reading Mode**: Distraction-free view.
+- **Favorites**: Pin important memories.
+- **Archive**: Collapse old years.
+- **Word Count & Reading Time**: Small writing enhancements.
+- **Export & Import**: Markdown/ZIP to ensure data ownership.
+- **Attachments**: PDF, Audio, etc.
+- **Theme Options**: Light, Dark, System.
+- **Better Empty States**: Encouraging copy.
+
+---
+
+## Future (v2)
+*Only to be considered after months of real use.*
+
+- **Maps**: Show memories by location.
+- **Memory Replay**: "On this day..."
+- **Smart Timeline**: Better grouping.
+- **Multiple Journals**: Optional isolation.
+- **OCR**: Search inside images.
+- **Semantic Search**: Only if it solves a real problem.
+- **Version History**: Restore previous edits (Git-backed).
+
+---
 
 ## Rejected
-*Features explicitly excluded to protect the simplicity and identity of the diary.*
+*These do not fit the philosophy and will not be built.*
 
-- **AI Assistant**: A diary is for human reflection, not machine generation.
-- **Productivity Dashboard**: This is a space for thoughts, not tasks.
-- **Kanban / Task Management**: Belongs in a separate tool.
-- **Collaboration**: Memories are deeply personal.
-- **Notifications / Reminders**: The diary should be pulled, never pushed.
-- **Database (PostgreSQL, etc.)**: Violates the principle of data ownership and simplicity.
+- Chatbot / AI-generated entries
+- Social feed, Sharing, Likes, Followers
+- Streaks, Coins, Badges (Gamification)
+- Ads or Analytics dashboards
+- Team collaboration
+- Dedicated Databases (PostgreSQL, etc.)
+
+---
+
+*If a feature isn't listed here, its priority is zero. Invest time in refining **Writing, Reading, Search, Timeline, and Performance** rather than expanding the feature surface area.*
