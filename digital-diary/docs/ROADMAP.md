@@ -49,6 +49,21 @@ This roadmap defines the boundary of what The Digital Diary is and what it will 
 
 ---
 
+## Stewardship
+
+The Digital Diary is feature complete.
+
+From this point onward:
+- Bugs may be fixed.
+- Performance may be improved.
+- Accessibility may be improved.
+- Documentation may be improved.
+- Existing features may be refined.
+
+No new feature may be added unless it is supported by repeated real-world usage and documented evidence.
+
+---
+
 ## Rejected
 *These do not fit the philosophy and will not be built.*
 
