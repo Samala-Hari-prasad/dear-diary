@@ -230,6 +230,18 @@ export function Editor({
             {uploading ? <Loader2 size={18} className="animate-spin" /> : <ImageIcon size={18} />}
             <input type="file" className="hidden" accept="image/*,audio/*,application/pdf" onChange={handleFileUploadEvent} disabled={uploading} />
           </label>
+          
+          <button
+            onClick={() => forceSave()}
+            className={cn(
+              "px-3 py-1.5 text-sm font-medium rounded-md transition-colors ml-2",
+              saveState === "Saving..." ? "bg-muted text-muted-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            )}
+            disabled={saveState === "Saving..."}
+          >
+            {saveState === "Saving..." ? "Saving..." : "Save"}
+          </button>
+
           {!isNew && (
             <>
               <button onClick={handleDelete} className="p-2 text-red-500 hover:bg-red-500/10 rounded-md transition-colors" title="Move to Trash">
@@ -237,7 +249,7 @@ export function Editor({
               </button>
               <button 
                 onClick={() => router.push(`/entry/${id}`)}
-                className="ml-2 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                className="px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
               >
                 Done
               </button>
