@@ -74,13 +74,29 @@ export function CalendarView({ items }: { items: CalendarItem[] }) {
           return (
             <div 
               key={idx} 
+              onClick={(e) => {
+                // If they clicked on a link, don't trigger the cell click
+                if ((e.target as HTMLElement).closest('a')) return;
+                
+                const dateStr = format(day, "yyyy-MM-dd");
+                
+                // If there's exactly one item and they clicked the cell, open the item
+                if (dayItems.length === 1) {
+                  window.location.href = `/entry/${dayItems[0].id}`;
+                  return;
+                }
+                
+                // Otherwise, open a new entry for this date
+                window.location.href = `/entry/new?date=${dateStr}`;
+              }}
               className={cn(
-                "min-h-[120px] bg-background p-2 transition-colors relative group",
+                "min-h-[120px] bg-background p-2 transition-colors relative group cursor-pointer",
                 !isCurrentMonth && "text-muted-foreground/30 bg-muted/10",
+                !hasItems && "hover:bg-muted/10",
                 hasItems && "hover:bg-muted/30"
               )}
             >
-              <div className="flex justify-between items-start mb-2">
+              <div className="flex justify-between items-start mb-2 pointer-events-none">
                 <span className={cn(
                   "text-sm font-medium flex items-center justify-center rounded-full w-7 h-7 transition-colors",
                   isToday ? "bg-foreground text-background" : "text-muted-foreground group-hover:text-foreground"
