@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { 
   Plus, 
-  Calendar, 
   Clock, 
   Search, 
   Sun, 
@@ -61,21 +60,11 @@ export function CommandPalette() {
             <Command.Item 
               onSelect={() => {
                 setOpen(false);
-                router.push("/memory/new");
+                router.push("/entry/new");
               }}
               className="flex items-center gap-2 px-2 py-2 mt-1 text-sm text-foreground rounded-md cursor-pointer aria-selected:bg-muted hover:bg-muted"
             >
               <Plus size={16} /> New Entry
-            </Command.Item>
-            <Command.Item 
-              onSelect={() => {
-                setOpen(false);
-                const today = new Date().toISOString().split('T')[0];
-                router.push(`/memory/${today}`);
-              }}
-              className="flex items-center gap-2 px-2 py-2 mt-1 text-sm text-foreground rounded-md cursor-pointer aria-selected:bg-muted hover:bg-muted"
-            >
-              <Calendar size={16} /> Jump to Today
             </Command.Item>
           </Command.Group>
 

@@ -1,31 +1,39 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useAutosave } from "@/hooks/use-autosave";
-import { updateMemory, createMemory, deleteMemory } from "@/lib/actions/memory";
+import { updateMemory, createMemory, deleteMemory, checkExistingEntry } from "@/lib/actions/memory";
 import { uploadImage } from "@/lib/actions/image";
 import { useRouter } from "next/navigation";
-import { Trash2, Image as ImageIcon, Loader2, Columns, Type, Eye } from "lucide-react";
+import { Trash2, Image as ImageIcon, Loader2, Columns, Type, Eye, CalendarIcon } from "lucide-react";
 import { compressImage, cn } from "@/lib/utils";
 import { MarkdownRenderer } from "./markdown-renderer";
 
 type EditorMode = "write" | "split" | "preview";
 
 export function Editor({
-  initialSlug,
+  initialId,
   initialContent,
   isNew,
+  initialEventDate,
+  initialCreatedAt,
 }: {
-  initialSlug: string;
+  initialId: string;
   initialContent: string;
   isNew: boolean;
+  initialEventDate: string;
+  initialCreatedAt: string;
 }) {
   const router = useRouter();
-  const [slug, setSlug] = useState(initialSlug);
+  const [id, setId] = useState(initialId);
   const [content, setContent] = useState(initialContent);
+  const [eventDate, setEventDate] = useState(initialEventDate);
   const [savedOnce, setSavedOnce] = useState(!isNew);
   const [uploading, setUploading] = useState(false);
   const [mode, setMode] = useState<EditorMode>("write");
+  const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
+  const ignoreDuplicateRef = useRef(false);
+  
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const extractTitle = (text: string) => {
@@ -36,20 +44,33 @@ export function Editor({
   const { saveState, errorMessage, forceSave } = useAutosave(content, async (newContent) => {
     if (!newContent.trim()) return;
     const title = extractTitle(newContent);
+    
     if (!savedOnce) {
-       const newSlug = new Date().toISOString().split('T')[0] + "-" + Math.random().toString(36).substring(2, 8);
-       setSlug(newSlug);
+       if (!ignoreDuplicateRef.current) {
+         const existingId = await checkExistingEntry(eventDate);
+         if (existingId) {
+           setDuplicateWarning(existingId);
+           return;
+         }
+       }
+       const newId = crypto.randomUUID();
+       setId(newId);
        setSavedOnce(true);
-       await createMemory(newSlug, title, newContent);
-       window.history.replaceState(null, "", `/memory/${newSlug}`);
+       await createMemory(newId, title, newContent, eventDate, initialCreatedAt);
+       window.history.replaceState(null, "", `/entry/${newId}`);
     } else {
-       await updateMemory(slug, title, newContent);
+       await updateMemory(id, title, newContent, eventDate);
     }
   }, 1000);
 
+  // If eventDate changes and we're not new, force a save so the date update persists
+  useEffect(() => {
+    if (savedOnce) forceSave();
+  }, [eventDate, savedOnce, forceSave]);
+
   const handleDelete = async () => {
     if (confirm("Move to trash?")) {
-      await deleteMemory(slug);
+      await deleteMemory(id);
       router.push("/");
     }
   };
@@ -77,7 +98,7 @@ export function Editor({
     } finally {
       setUploading(false);
     }
-  }, [content, uploadImage, setContent]);
+  }, [content, setContent]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -107,18 +128,69 @@ export function Editor({
     }
   }, [forceSave]);
 
+  const isBackfilled = initialCreatedAt && eventDate !== initialCreatedAt.split('T')[0] && !isNew;
+
   return (
-    <div className="flex flex-col h-full mx-auto w-full max-w-6xl">
-      <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
-        <div className="text-sm text-muted-foreground flex flex-col justify-center min-w-[100px]">
-          <span className={cn("font-medium", saveState === "Upload Failed" ? "text-red-500" : "")}>
-            {saveState}
-          </span>
-          {saveState === "Upload Failed" && errorMessage && (
-            <span className="text-xs text-red-500 max-w-[200px] truncate" title={errorMessage}>
-              {errorMessage}
-            </span>
-          )}
+    <div className="flex flex-col h-full mx-auto w-full max-w-6xl relative">
+      {duplicateWarning && (
+        <div className="absolute inset-0 bg-background/80 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-card p-6 rounded-lg border border-border shadow-lg max-w-sm w-full text-center">
+            <h3 className="text-lg font-semibold mb-2">Entry exists</h3>
+            <p className="text-muted-foreground mb-6">You already have an entry for {eventDate}.</p>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => router.push(`/entry/${duplicateWarning}`)} 
+                className="bg-primary text-primary-foreground py-2 rounded-md font-medium"
+              >
+                Open Existing
+              </button>
+              <button 
+                onClick={() => {
+                  ignoreDuplicateRef.current = true;
+                  setDuplicateWarning(null);
+                  forceSave(true);
+                }} 
+                className="text-muted-foreground hover:text-foreground py-2 font-medium"
+              >
+                Create Another Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between p-4 border-b border-border shrink-0 flex-wrap gap-4">
+        <div className="flex items-start gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground/70">Event Date</label>
+            <div className="flex items-center gap-2 bg-muted/30 px-2 py-1 rounded-md border border-border/50">
+              <CalendarIcon size={14} className="text-muted-foreground" />
+              <input 
+                type="date" 
+                value={eventDate} 
+                onChange={(e) => setEventDate(e.target.value)} 
+                className="bg-transparent border-none text-foreground font-medium p-0 focus:ring-0 text-sm outline-none" 
+              />
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-1 justify-center min-w-[100px] pt-1">
+            {isBackfilled && (
+              <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded-full w-fit">
+                Recorded on {initialCreatedAt.split('T')[0]}
+              </span>
+            )}
+            <div className="flex flex-col">
+              <span className={cn("text-xs font-medium", saveState === "Upload Failed" ? "text-red-500" : "text-muted-foreground")}>
+                {saveState}
+              </span>
+              {saveState === "Upload Failed" && errorMessage && (
+                <span className="text-xs text-red-500 max-w-[200px] truncate" title={errorMessage}>
+                  {errorMessage}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
         
         <div className="flex bg-muted/50 rounded-md p-1 border border-border">

@@ -1,11 +1,16 @@
 import { getFile, saveFile, deleteFile } from "./repository";
 
 export interface MemoryIndexItem {
-  slug: string;
+  id: string;
   title: string;
-  date: string;
-  snippet: string;
+  eventDate: string;
+  createdAt: string;
   updatedAt: string;
+  snippet: string;
+  tags?: string[];
+  collection?: string;
+  entryType?: string;
+  favorite?: boolean;
 }
 
 import { githubFetch } from "./client";
@@ -26,16 +31,16 @@ export async function getDiscoveryItems(): Promise<(MemoryIndexItem & { readingT
     const pages = await githubFetch<{ name: string; size: number }[]>("contents/content/pages");
     if (Array.isArray(pages)) {
       pages.forEach(page => {
-        const slug = page.name.replace(".md", "");
-        sizeMap.set(slug, page.size);
+        const id = page.name.replace(".md", "");
+        sizeMap.set(id, page.size);
       });
     }
   } catch (e) {
     console.warn("Failed to fetch pages directory for sizes", e);
   }
 
-  return items.map(item => {
-    const size = sizeMap.get(item.slug) || 0;
+  const enhancedItems = items.map(item => {
+    const size = sizeMap.get(item.id) || 0;
     // 1 byte ≈ 1 char. ~5 chars per word, ~200 words per minute => ~1000 bytes per minute
     const readingTimeMin = Math.max(1, Math.ceil(size / 1000));
     return {
@@ -43,6 +48,8 @@ export async function getDiscoveryItems(): Promise<(MemoryIndexItem & { readingT
       readingTimeMin
     };
   });
+
+  return enhancedItems.sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime());
 }
 
 export async function saveIndex(items: MemoryIndexItem[], sha?: string): Promise<string> {

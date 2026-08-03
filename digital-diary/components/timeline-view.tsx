@@ -2,24 +2,29 @@ import Link from "next/link";
 import { format, parseISO } from "date-fns";
 
 export interface TimelineItem {
-  slug: string;
+  id: string;
   title: string;
-  date: string;
+  eventDate: string;
   snippet: string;
   updatedAt: string;
   readingTimeMin?: number;
 }
 
 export function TimelineView({ items }: { items: TimelineItem[] }) {
-  // Sort items by date descending
-  const sortedItems = [...items].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  // Validate and sort items by eventDate descending
+  const validItems = items.filter(item => item && item.id && item.eventDate);
+  const sortedItems = [...validItems].sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime());
 
   // Group by Month/Year
   const grouped = sortedItems.reduce((acc, item) => {
-    const date = parseISO(item.date);
-    const monthYear = format(date, "MMMM yyyy");
-    if (!acc[monthYear]) acc[monthYear] = [];
-    acc[monthYear].push(item);
+    try {
+      const date = parseISO(item.eventDate);
+      const monthYear = format(date, "MMMM yyyy");
+      if (!acc[monthYear]) acc[monthYear] = [];
+      acc[monthYear].push(item);
+    } catch (e) {
+      console.warn("Skipping item with invalid date:", item.eventDate);
+    }
     return acc;
   }, {} as Record<string, TimelineItem[]>);
 
@@ -49,13 +54,13 @@ export function TimelineView({ items }: { items: TimelineItem[] }) {
               const readingTime = item.readingTimeMin || 1;
               return (
                 <Link 
-                  href={`/memory/${item.slug}`} 
-                  key={item.slug}
+                  href={`/entry/${item.id}`} 
+                  key={item.id}
                   className="flex group relative py-3 items-start gap-6 hover:bg-muted/30 rounded-lg -ml-4 pl-4 pr-4 transition-colors"
                 >
                   <div className="flex flex-col items-end min-w-[48px] shrink-0 pt-0.5">
                     <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-                      {format(parseISO(item.date), "MMM d")}
+                      {format(parseISO(item.eventDate), "MMM d")}
                     </span>
                   </div>
                   

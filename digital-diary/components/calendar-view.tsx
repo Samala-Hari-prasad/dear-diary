@@ -7,9 +7,9 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export interface CalendarItem {
-  slug: string;
+  id: string;
   title: string;
-  date: string;
+  eventDate: string;
 }
 
 export function CalendarView({ items }: { items: CalendarItem[] }) {
@@ -59,7 +59,14 @@ export function CalendarView({ items }: { items: CalendarItem[] }) {
           </div>
         ))}
         {days.map((day, idx) => {
-          const dayItems = items.filter(item => isSameDay(parseISO(item.date), day));
+          const dayItems = items.filter(item => {
+            if (!item || !item.id || !item.eventDate) return false;
+            try {
+              return isSameDay(parseISO(item.eventDate), day);
+            } catch (e) {
+              return false;
+            }
+          });
           const isCurrentMonth = isSameMonth(day, monthStart);
           const hasItems = dayItems.length > 0;
           const isToday = isSameDay(day, new Date());
@@ -85,8 +92,8 @@ export function CalendarView({ items }: { items: CalendarItem[] }) {
               <div className="space-y-1.5 overflow-y-auto max-h-[80px] custom-scrollbar">
                 {dayItems.map(item => (
                   <Link 
-                    key={item.slug} 
-                    href={`/memory/${item.slug}`}
+                    key={item.id} 
+                    href={`/entry/${item.id}`}
                     className="block text-xs font-medium bg-secondary/50 text-secondary-foreground hover:bg-primary hover:text-primary-foreground px-2 py-1.5 rounded truncate transition-all shadow-sm"
                     title={item.title || "Untitled"}
                   >

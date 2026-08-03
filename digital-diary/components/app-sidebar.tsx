@@ -14,7 +14,7 @@ export async function AppSidebar() {
         <ThemeToggle />
       </div>
       <div className="p-2 border-b border-border">
-        <Link href="/memory/new" className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md hover:bg-foreground hover:text-background bg-foreground/5 transition-colors">
+        <Link href="/entry/new" className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md hover:bg-foreground hover:text-background bg-foreground/5 transition-colors">
           <Plus size={16} /> New Entry
         </Link>
       </div>

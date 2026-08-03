@@ -4,13 +4,16 @@ import { useState } from "react";
 import { MemoryIndexItem } from "@/lib/github/storage";
 import { Search } from "lucide-react";
 
+import { format, parseISO } from "date-fns";
+
 export function SidebarClient({ items }: { items: MemoryIndexItem[] }) {
   const [search, setSearch] = useState("");
   const [dateStr, setDateStr] = useState("");
   
   const filtered = items.filter(item => {
-    if (search && !item.title.toLowerCase().includes(search.toLowerCase()) && !item.snippet.toLowerCase().includes(search.toLowerCase())) return false;
-    if (dateStr && !item.date.startsWith(dateStr)) return false;
+    if (!item || !item.id || !item.eventDate) return false;
+    if (search && !item.title?.toLowerCase().includes(search.toLowerCase()) && !item.snippet?.toLowerCase().includes(search.toLowerCase())) return false;
+    if (dateStr && !item.eventDate.startsWith(dateStr)) return false;
     return true;
   });
 
@@ -35,13 +38,21 @@ export function SidebarClient({ items }: { items: MemoryIndexItem[] }) {
         />
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
-        {filtered.map((item) => (
-          <Link key={item.slug} href={`/memory/${item.slug}`} className="block p-3 text-sm rounded-md hover:bg-muted transition-colors border border-transparent hover:border-border">
-            <div className="font-medium truncate text-foreground">{item.title}</div>
-            <div className="text-xs text-muted-foreground truncate mt-1">{item.snippet}</div>
-            <div className="text-[10px] text-muted-foreground mt-2">{new Date(item.date).toLocaleDateString()}</div>
-          </Link>
-        ))}
+        {filtered.map((item) => {
+          let dateDisplay = "";
+          try {
+            dateDisplay = format(parseISO(item.eventDate), "MMM d, yyyy");
+          } catch (e) {
+            dateDisplay = item.eventDate;
+          }
+          return (
+            <Link key={item.id} href={`/entry/${item.id}`} className="block p-3 text-sm rounded-md hover:bg-muted transition-colors border border-transparent hover:border-border">
+              <div className="font-medium truncate text-foreground">{item.title}</div>
+              <div className="text-xs text-muted-foreground truncate mt-1">{item.snippet}</div>
+              <div className="text-[10px] text-muted-foreground mt-2">{dateDisplay}</div>
+            </Link>
+          );
+        })}
         {filtered.length === 0 && (
           <div className="text-center text-sm text-muted-foreground p-4">No entries found</div>
         )}

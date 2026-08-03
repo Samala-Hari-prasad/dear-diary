@@ -13,12 +13,28 @@ export function useAutosave(
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const contentRef = useRef(content);
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
+  const isSavingRef = useRef(false);
 
   const performSave = useCallback(async (currentContent: string) => {
     if (!navigator.onLine) {
       setSaveState("Offline");
       return;
     }
+    
+    if (isSavingRef.current) {
+      // If a save is already in progress, we don't want to run concurrently.
+      // The useEffect will trigger again when content changes, but if it doesn't,
+      // we need to ensure the latest content gets saved eventually.
+      // A simple way is to just let the timeout handle it later, or queue it.
+      // But actually, just returning is fine if the timeout is still running?
+      // No, if we return, it's dropped. So we should re-trigger the timeout.
+      if (saveTimeout.current) clearTimeout(saveTimeout.current);
+      saveTimeout.current = setTimeout(() => performSave(currentContent), 1000);
+      return;
+    }
+    
+    isSavingRef.current = true;
+    
     setSaveState("Saving...");
     setErrorMessage(null);
     try {
@@ -39,12 +55,14 @@ export function useAutosave(
         setErrorMessage("Failed to save changes. Will retry.");
       }
       setSaveState("Upload Failed");
+    } finally {
+      isSavingRef.current = false;
     }
   }, [onSave]);
 
-  const forceSave = useCallback(async () => {
+  const forceSave = useCallback(async (force: boolean = false) => {
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
-    if (content !== contentRef.current) {
+    if (force || content !== contentRef.current) {
       await performSave(content);
     } else {
       setSaveState("Saved");
