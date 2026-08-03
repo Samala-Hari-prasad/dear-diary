@@ -12,7 +12,10 @@ export interface CalendarItem {
   eventDate: string;
 }
 
+import { useRouter } from "next/navigation";
+
 export function CalendarView({ items }: { items: CalendarItem[] }) {
+  const router = useRouter();
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const monthStart = startOfMonth(currentDate);
@@ -82,12 +85,12 @@ export function CalendarView({ items }: { items: CalendarItem[] }) {
                 
                 // If there's exactly one item and they clicked the cell, open the item
                 if (dayItems.length === 1) {
-                  window.location.href = `/entry/${dayItems[0].id}`;
+                  router.push(`/entry/${dayItems[0].id}`);
                   return;
                 }
                 
                 // Otherwise, open a new entry for this date
-                window.location.href = `/entry/new?date=${dateStr}`;
+                router.push(`/entry/new?date=${dateStr}`);
               }}
               className={cn(
                 "min-h-[120px] bg-background p-2 transition-colors relative group cursor-pointer",
