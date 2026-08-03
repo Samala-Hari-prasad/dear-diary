@@ -1,4 +1,5 @@
 import { Editor } from "@/components/editor";
+import { ReadingMode } from "@/components/reading-mode";
 import { getPage } from "@/lib/github/storage";
 import { notFound } from "next/navigation";
 import matter from "gray-matter";
@@ -20,11 +21,10 @@ export default async function EntryPage(props: { params: Promise<{ id: string }>
 
   const parsed = matter(page.content);
   
-  return <Editor 
-    initialId={id} 
-    initialContent={parsed.content} 
-    isNew={false} 
-    initialEventDate={parsed.data.eventDate || ""}
-    initialCreatedAt={parsed.data.createdAt || ""}
+  return <ReadingMode 
+    id={id}
+    title={parsed.data.title || "Untitled"}
+    content={parsed.content}
+    eventDate={parsed.data.eventDate || ""}
   />;
 }

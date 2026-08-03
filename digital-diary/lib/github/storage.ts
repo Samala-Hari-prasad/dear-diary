@@ -56,6 +56,18 @@ export async function saveIndex(items: MemoryIndexItem[], sha?: string): Promise
   return await saveFile("content/index.json", JSON.stringify(items, null, 2), sha, "Update index.json");
 }
 
+export async function getTrashIndex(): Promise<{ items: MemoryIndexItem[]; sha?: string }> {
+  const file = await getFile("content/trash-index.json");
+  if (!file) {
+    return { items: [] };
+  }
+  return { items: JSON.parse(file.content), sha: file.sha };
+}
+
+export async function saveTrashIndex(items: MemoryIndexItem[], sha?: string): Promise<string> {
+  return await saveFile("content/trash-index.json", JSON.stringify(items, null, 2), sha, "Update trash-index.json");
+}
+
 export async function getPage(slug: string): Promise<{ content: string; sha: string } | null> {
   return await getFile(`content/pages/${slug}.md`);
 }
@@ -78,4 +90,20 @@ export async function deletePageFile(slug: string, sha: string): Promise<void> {
 
 export async function deleteTrashPageFile(slug: string, sha: string): Promise<void> {
   await deleteFile(`content/trash/${slug}.md`, sha, `Permanently delete ${slug}`);
+}
+
+export async function getAttachmentsList(folder: "images" | "audio" | "pdf"): Promise<{ name: string; url: string; size: number }[]> {
+  try {
+    const files = await githubFetch<any[]>(`contents/content/attachments/${folder}`);
+    if (Array.isArray(files)) {
+      return files.map(file => ({
+        name: file.name,
+        url: `https://raw.githubusercontent.com/Samala-Hari-prasad/dear-diary/main/content/attachments/${folder}/${file.name}`,
+        size: file.size
+      }));
+    }
+  } catch (e) {
+    console.warn(`Failed to fetch attachments for ${folder}`, e);
+  }
+  return [];
 }

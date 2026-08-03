@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { MemoryIndexItem } from "@/lib/github/storage";
-import { Search } from "lucide-react";
+import { Search, Trash2, Image as ImageIcon } from "lucide-react";
 
 import { format, parseISO } from "date-fns";
 
@@ -56,6 +56,22 @@ export function SidebarClient({ items }: { items: MemoryIndexItem[] }) {
         {filtered.length === 0 && (
           <div className="text-center text-sm text-muted-foreground p-4">No entries found</div>
         )}
+      </div>
+      <div className="p-2 border-t border-border mt-auto flex flex-col gap-1">
+        <Link 
+          href="/gallery" 
+          className="flex items-center gap-2 p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+        >
+          <ImageIcon size={16} />
+          Gallery
+        </Link>
+        <Link 
+          href="/trash" 
+          className="flex items-center gap-2 p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+        >
+          <Trash2 size={16} />
+          Trash
+        </Link>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 "use server";
 
-import { getIndex, saveIndex, getPage, savePage, saveTrashPage, deletePageFile, getTrashPage, deleteTrashPageFile } from "@/lib/github/storage";
+import { getIndex, saveIndex, getPage, savePage, saveTrashPage, deletePageFile, getTrashPage, deleteTrashPageFile, getTrashIndex, saveTrashIndex } from "@/lib/github/storage";
 import { getSession } from "@/lib/auth/session";
 import { revalidatePath } from "next/cache";
 import matter from "gray-matter";
@@ -91,13 +91,19 @@ export async function deleteMemory(id: string) {
   const page = await getPage(id);
   if (!page) throw new Error("Not found");
 
-  const { items, sha } = await getIndex();
+  const { items, sha: indexSha } = await getIndex();
+  const deletedItem = items.find((i) => i.id === id);
+  if (!deletedItem) throw new Error("Not found in index");
   
   await saveTrashPage(id, page.content);
   await deletePageFile(id, page.sha);
 
   const newItems = items.filter((i) => i.id !== id);
-  await saveIndex(newItems, sha);
+  await saveIndex(newItems, indexSha);
+
+  const { items: trashItems, sha: trashSha } = await getTrashIndex();
+  trashItems.unshift(deletedItem);
+  await saveTrashIndex(trashItems, trashSha);
 
   revalidatePath("/");
   return { success: true };
@@ -113,24 +119,65 @@ export async function restoreMemory(id: string) {
   await savePage(id, trashPage.content);
   await deleteTrashPageFile(id, trashPage.sha);
 
-  const { items, sha } = await getIndex();
-  
-  const parsed = matter(trashPage.content);
-  const title = parsed.data.title || "Untitled";
-  const snippet = parsed.content.slice(0, 100).replace(/\n/g, " ");
-  
-  items.unshift({
-    id,
-    title,
-    snippet,
-    eventDate: parsed.data.eventDate || new Date().toISOString().split('T')[0],
-    createdAt: parsed.data.createdAt || new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    entryType: parsed.data.entryType || "journal"
-  });
+  const { items: trashItems, sha: trashSha } = await getTrashIndex();
+  const restoredItem = trashItems.find((i) => i.id === id);
+  const newTrashItems = trashItems.filter((i) => i.id !== id);
+  await saveTrashIndex(newTrashItems, trashSha);
 
-  await saveIndex(items, sha);
+  const { items, sha: indexSha } = await getIndex();
+  
+  if (restoredItem) {
+    items.unshift(restoredItem);
+  } else {
+    const parsed = matter(trashPage.content);
+    items.unshift({
+      id,
+      title: parsed.data.title || "Untitled",
+      snippet: parsed.content.slice(0, 100).replace(/\n/g, " "),
+      eventDate: parsed.data.eventDate || new Date().toISOString().split('T')[0],
+      createdAt: parsed.data.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      entryType: parsed.data.entryType || "journal"
+    });
+  }
 
+  await saveIndex(items, indexSha);
+
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function permanentDeleteMemory(id: string) {
+  const session = await getSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const trashPage = await getTrashPage(id);
+  if (trashPage) {
+    await deleteTrashPageFile(id, trashPage.sha);
+  }
+
+  const { items, sha } = await getTrashIndex();
+  const newItems = items.filter(i => i.id !== id);
+  await saveTrashIndex(newItems, sha);
+
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function emptyTrash() {
+  const session = await getSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const { items, sha } = await getTrashIndex();
+  
+  for (const item of items) {
+    const page = await getTrashPage(item.id);
+    if (page) {
+      await deleteTrashPageFile(item.id, page.sha);
+    }
+  }
+
+  await saveTrashIndex([], sha);
   revalidatePath("/");
   return { success: true };
 }

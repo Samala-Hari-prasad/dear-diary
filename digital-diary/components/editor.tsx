@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useAutosave } from "@/hooks/use-autosave";
 import { updateMemory, createMemory, deleteMemory, checkExistingEntry } from "@/lib/actions/memory";
-import { uploadImage } from "@/lib/actions/image";
+import { uploadAttachment } from "@/lib/actions/attachment";
 import { useRouter } from "next/navigation";
 import { Trash2, Image as ImageIcon, Loader2, Columns, Type, Eye, CalendarIcon } from "lucide-react";
 import { compressImage, cn } from "@/lib/utils";
@@ -78,10 +78,18 @@ export function Editor({
   const handleFileUpload = useCallback(async (file: File) => {
     setUploading(true);
     try {
-      const compressed = await compressImage(file);
       const formData = new FormData();
-      formData.append("file", compressed);
-      const url = await uploadImage(formData);
+      
+      let finalFile: File = file;
+      if (file.type.startsWith("image/")) {
+        finalFile = await compressImage(file);
+      }
+      
+      formData.append("file", finalFile);
+      const url = await uploadAttachment(formData);
+      
+      const isImage = finalFile.type.startsWith("image/");
+      const mdStr = isImage ? `![${finalFile.name}](${url})` : `[${finalFile.name}](${url})`;
       
       const textarea = textareaRef.current;
       if (textarea) {
@@ -89,9 +97,9 @@ export function Editor({
         const end = textarea.selectionEnd;
         const textBefore = content.substring(0, start);
         const textAfter = content.substring(end);
-        setContent(textBefore + `\n![${file.name}](${url})\n` + textAfter);
+        setContent(textBefore + `\n${mdStr}\n` + textAfter);
       } else {
-        setContent(prev => prev + `\n![${file.name}](${url})\n`);
+        setContent(prev => prev + `\n${mdStr}\n`);
       }
     } catch {
       alert("Upload failed");
@@ -100,7 +108,7 @@ export function Editor({
     }
   }, [content, setContent]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUploadEvent = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleFileUpload(file);
   };
@@ -108,14 +116,14 @@ export function Editor({
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith("image/")) {
+    if (file && (file.type.startsWith("image/") || file.type.startsWith("audio/") || file.type === "application/pdf")) {
       handleFileUpload(file);
     }
   }, [handleFileUpload]);
 
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     const file = e.clipboardData.files?.[0];
-    if (file && file.type.startsWith("image/")) {
+    if (file && (file.type.startsWith("image/") || file.type.startsWith("audio/") || file.type === "application/pdf")) {
       e.preventDefault();
       handleFileUpload(file);
     }
@@ -218,14 +226,22 @@ export function Editor({
         </div>
 
         <div className="flex items-center gap-2">
-          <label className="p-2 text-muted-foreground hover:bg-muted rounded-md cursor-pointer transition-colors relative" title="Upload Image">
+          <label className="p-2 text-muted-foreground hover:bg-muted rounded-md cursor-pointer transition-colors relative" title="Upload Attachment">
             {uploading ? <Loader2 size={18} className="animate-spin" /> : <ImageIcon size={18} />}
-            <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+            <input type="file" className="hidden" accept="image/*,audio/*,application/pdf" onChange={handleFileUploadEvent} disabled={uploading} />
           </label>
           {!isNew && (
-            <button onClick={handleDelete} className="p-2 text-red-500 hover:bg-red-500/10 rounded-md transition-colors" title="Move to Trash">
-              <Trash2 size={18} />
-            </button>
+            <>
+              <button onClick={handleDelete} className="p-2 text-red-500 hover:bg-red-500/10 rounded-md transition-colors" title="Move to Trash">
+                <Trash2 size={18} />
+              </button>
+              <button 
+                onClick={() => router.push(`/entry/${id}`)}
+                className="ml-2 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              >
+                Done
+              </button>
+            </>
           )}
         </div>
       </div>
